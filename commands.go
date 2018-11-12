@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	atgen "github.com/mizzy/atgen/lib"
 	"github.com/urfave/cli"
 )
@@ -39,7 +37,10 @@ func doGen(c *cli.Context) error {
 		return err
 	}
 
-	fmt.Printf("%#v\n", testFuncs)
+	err = testFuncs.Generate(c.String("template"))
+	if err != nil {
+		return err
+	}
 
-	return nil
+	return err
 }

@@ -1,5 +1,7 @@
 package atgen
 
+type TestFuncs []TestFunc
+
 type TestFunc struct {
 	Name  string
 	Tests []Tester

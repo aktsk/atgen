@@ -6,8 +6,8 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-func ParseYaml(file string) ([]TestFunc, error) {
-	var testFuncs []TestFunc
+func ParseYaml(file string) (TestFuncs, error) {
+	var testFuncs TestFuncs
 
 	buf, err := ioutil.ReadFile(file)
 	if err != nil {
