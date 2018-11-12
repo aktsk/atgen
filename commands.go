@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+
+	atgen "github.com/mizzy/atgen/lib"
 	"github.com/urfave/cli"
 )
 
@@ -31,5 +34,12 @@ var commandGen = cli.Command{
 }
 
 func doGen(c *cli.Context) error {
+	testFuncs, err := atgen.ParseYaml(c.String("yaml"))
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%#v\n", testFuncs)
+
 	return nil
 }

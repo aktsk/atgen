@@ -21,12 +21,14 @@ type Req struct {
 	Headers Headers
 }
 
+type Res struct {
+	Status  int
+	Params  Params
+	Headers Headers
+}
+
 type Params map[string]string
 type Headers map[string]string
-
-type Res struct {
-	Params map[string]string
-}
 
 type Tester interface {
 	IsSubtests() bool
