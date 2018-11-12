@@ -12,9 +12,7 @@ type Test struct {
 	Res    Res
 }
 
-type SubTests struct {
-	SubTests []Test
-}
+type SubTests []Test
 
 type Req struct {
 	Params  Params

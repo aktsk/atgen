@@ -28,6 +28,8 @@ func ParseYaml(file string) ([]TestFunc, error) {
 			t := t.(map[interface{}]interface{})
 			if t["path"] != nil {
 				testFunc.Tests = append(testFunc.Tests, convertToTest(t))
+			} else {
+				testFunc.Tests = append(testFunc.Tests, convertToSubTests(t))
 			}
 		}
 
@@ -44,6 +46,17 @@ func convertToTest(t map[interface{}]interface{}) Test {
 		Req:    convertToReq(t["req"]),
 		Res:    convertToRes(t["res"]),
 	}
+}
+
+func convertToSubTests(s map[interface{}]interface{}) SubTests {
+	subTests := SubTests{}
+
+	for _, t := range s["subtests"].([]interface{}) {
+		test := convertToTest(t.(map[interface{}]interface{}))
+		subTests = append(subTests, test)
+	}
+
+	return subTests
 }
 
 func convertToReq(r interface{}) Req {
