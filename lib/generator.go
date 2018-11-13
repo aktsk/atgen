@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	util "github.com/lkesteloot/astutil"
 	"golang.org/x/tools/go/ast/astutil"
 )
 
@@ -35,7 +36,7 @@ func (g *Generator) Generate() error {
 
 	var nodes []ast.Node
 	for _, testFunc := range g.TestFuncs {
-		n := testFuncNode
+		n := util.DuplicateNode(testFuncNode)
 		n.(*ast.FuncDecl).Name.Name = testFunc.Name
 		for _, test := range testFunc.Tests {
 			_ = test
@@ -47,14 +48,15 @@ func (g *Generator) Generate() error {
 
 	n := astutil.Apply(f, func(cr *astutil.Cursor) bool {
 		if cr.Name() == "Decls" {
-			switch v := cr.Node().(type) {
-			case *ast.GenDecl:
-				if v.Tok == token.IMPORT {
-					for _, n := range nodes {
-						cr.InsertAfter(n)
-					}
+			switch cr.Node().(type) {
+			case *ast.FuncDecl:
+				for _, n := range nodes {
+					cr.InsertBefore(n)
 				}
 			}
+		}
+		if cr.Node() == testFuncNode {
+			cr.Delete()
 		}
 		return true
 	}, nil)
