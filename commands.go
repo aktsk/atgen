@@ -32,12 +32,17 @@ var commandGen = cli.Command{
 }
 
 func doGen(c *cli.Context) error {
-	testFuncs, err := atgen.ParseYaml(c.String("yaml"))
+	generator := atgen.Generator{
+		Yaml:     c.String("yaml"),
+		Template: c.String("template"),
+	}
+
+	err := generator.ParseYaml()
 	if err != nil {
 		return err
 	}
 
-	err = testFuncs.Generate(c.String("template"))
+	err = generator.Generate()
 	if err != nil {
 		return err
 	}

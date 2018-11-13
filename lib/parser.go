@@ -6,24 +6,23 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-func ParseYaml(file string) (TestFuncs, error) {
+func (g *Generator) ParseYaml() error {
 	var testFuncs TestFuncs
 
-	buf, err := ioutil.ReadFile(file)
+	buf, err := ioutil.ReadFile(g.Yaml)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var parsed []map[interface{}]interface{}
 	err = yaml.Unmarshal(buf, &parsed)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	for _, p := range parsed {
 		testFunc := TestFunc{}
 		testFunc.Name = p["name"].(string)
-
 		for _, t := range p["tests"].([]interface{}) {
 			t := t.(map[interface{}]interface{})
 			if t["path"] != nil {
@@ -36,7 +35,9 @@ func ParseYaml(file string) (TestFuncs, error) {
 		testFuncs = append(testFuncs, testFunc)
 	}
 
-	return testFuncs, nil
+	g.TestFuncs = testFuncs
+
+	return nil
 }
 
 func convertToTest(t map[interface{}]interface{}) Test {

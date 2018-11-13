@@ -1,5 +1,11 @@
 package atgen
 
+type Generator struct {
+	Yaml      string
+	Template  string
+	TestFuncs TestFuncs
+}
+
 type TestFuncs []TestFunc
 
 type TestFunc struct {
