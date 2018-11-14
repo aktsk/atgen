@@ -132,17 +132,16 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 			}
 		case *ast.CompositeLit:
 			if rewriteReqHeaders {
-				h, _ := parser.ParseExpr(fmt.Sprintf("%#v\n", test.Req.Headers))
+				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Req.Headers))
 				cr.Replace(h)
 			} else if rewriteResHeaders {
-				h, _ := parser.ParseExpr(fmt.Sprintf("%#v\n", test.Res.Headers))
+				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Headers))
 				cr.Replace(h)
 			} else if rewriteResParams {
-				p, _ := parser.ParseExpr(fmt.Sprintf("%#v\n", test.Res.Params))
+				p, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Params))
 				cr.Replace(p)
 			}
 		}
-		//fmt.Printf("%#v\n", cr.Node())
 		return true
 	}, nil)
 	return n
