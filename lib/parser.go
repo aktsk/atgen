@@ -77,8 +77,8 @@ func convertToRes(r interface{}) Res {
 	}
 }
 
-func convertToParams(p interface{}) Params {
-	params := Params{}
+func convertToParams(p interface{}) map[string]string {
+	params := make(map[string]string)
 	if p != nil {
 		for k, v := range p.(map[interface{}]interface{}) {
 			params[k.(string)] = v.(string)
@@ -87,8 +87,8 @@ func convertToParams(p interface{}) Params {
 	return params
 }
 
-func convertToHeaders(h interface{}) Headers {
-	headers := Headers{}
+func convertToHeaders(h interface{}) map[string]string {
+	headers := make(map[string]string)
 	if h != nil {
 		for k, v := range h.(map[interface{}]interface{}) {
 			headers[k.(string)] = v.(string)

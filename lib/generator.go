@@ -1,6 +1,8 @@
 package atgen
 
 import (
+	"encoding/json"
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -22,7 +24,6 @@ func (g *Generator) Generate() error {
 	var (
 		testFuncNode ast.Node
 		testNode     ast.Node
-		subtestNode  ast.Node
 	)
 
 	cmap := ast.NewCommentMap(fset, f, f.Comments)
@@ -32,17 +33,12 @@ func (g *Generator) Generate() error {
 				testFuncNode = node
 			} else if strings.Contains(cgroup.Text(), "Test block") {
 				testNode = node
-			} else if strings.Contains(cgroup.Text(), "Subtest block") {
-				subtestNode = node
 			}
 		}
 	}
 
 	astutil.Apply(testFuncNode, func(cr *astutil.Cursor) bool {
 		if cr.Node() == testNode {
-			cr.Delete()
-		}
-		if cr.Node() == subtestNode {
 			cr.Delete()
 		}
 		return true
@@ -105,8 +101,48 @@ func (g *Generator) Generate() error {
 }
 
 func rewriteTestNode(n ast.Node, test Test) ast.Node {
+	rewriteReqHeaders := false
+	rewriteResHeaders := false
+	rewriteResParams := false
 	astutil.Apply(n, func(cr *astutil.Cursor) bool {
-		// TODO: rewrite test node
+		switch v := cr.Node().(type) {
+		case *ast.BasicLit:
+			switch v.Value {
+			case `"Method"`:
+				v.Value = fmt.Sprintf(`"%s"`, strings.ToUpper(test.Method))
+			case `"Path"`:
+				v.Value = fmt.Sprintf(`"%s"`, test.Path)
+			case "`reqParams`":
+				params, _ := json.Marshal(test.Req.Params)
+				v.Value = fmt.Sprintf("`%s`", params)
+			}
+		case *ast.Ident:
+			if v.Name == "reqHeaders" {
+				rewriteReqHeaders = true
+				rewriteResHeaders = false
+				rewriteResParams = false
+			} else if v.Name == "resHeaders" {
+				rewriteReqHeaders = false
+				rewriteResHeaders = true
+				rewriteResParams = false
+			} else if v.Name == "resParams" {
+				rewriteReqHeaders = false
+				rewriteResHeaders = false
+				rewriteResParams = true
+			}
+		case *ast.CompositeLit:
+			if rewriteReqHeaders {
+				h, _ := parser.ParseExpr(fmt.Sprintf("%#v\n", test.Req.Headers))
+				cr.Replace(h)
+			} else if rewriteResHeaders {
+				h, _ := parser.ParseExpr(fmt.Sprintf("%#v\n", test.Res.Headers))
+				cr.Replace(h)
+			} else if rewriteResParams {
+				p, _ := parser.ParseExpr(fmt.Sprintf("%#v\n", test.Res.Params))
+				cr.Replace(p)
+			}
+		}
+		//fmt.Printf("%#v\n", cr.Node())
 		return true
 	}, nil)
 	return n

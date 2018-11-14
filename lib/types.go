@@ -23,18 +23,15 @@ type Test struct {
 type SubTests []Test
 
 type Req struct {
-	Params  Params
-	Headers Headers
+	Params  map[string]string
+	Headers map[string]string
 }
 
 type Res struct {
 	Status  int
-	Params  Params
-	Headers Headers
+	Params  map[string]string
+	Headers map[string]string
 }
-
-type Params map[string]string
-type Headers map[string]string
 
 type Tester interface {
 	IsSubtests() bool
