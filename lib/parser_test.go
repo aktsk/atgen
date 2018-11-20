@@ -17,13 +17,13 @@ func TestParse(t *testing.T) {
 		t.Fatal("testFunc.Name should be TestFoo")
 	}
 
-	if testFunc.ApiVersion[0] != "v1beta1" {
-		t.Fatal("testFunc.ApiVersion[0] should be v1beta1")
+	if testFunc.APIVersion[0] != "v1beta1" {
+		t.Fatal("testFunc.APIVersion[0] should be v1beta1")
 	}
 
 	test := testFunc.Tests[0].(Test)
-	if test.ApiVersion[0] != "v1beta1" {
-		t.Fatal("test.ApiVersion[0]")
+	if test.APIVersion[0] != "v1beta1" {
+		t.Fatal("test.APIVersion[0]")
 	}
 }
 

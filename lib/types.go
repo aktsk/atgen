@@ -11,11 +11,11 @@ type TestFuncs []TestFunc
 type TestFunc struct {
 	Name       string
 	Tests      []Tester
-	ApiVersion []string
+	APIVersion []string
 }
 
 type Test struct {
-	ApiVersion []string
+	APIVersion []string
 	Path       string
 	Method     string
 	Req        Req
