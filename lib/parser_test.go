@@ -6,7 +6,6 @@ import (
 
 func TestParse(t *testing.T) {
 	parsed, err := parseYaml([]byte(yamlString))
-
 	if err != nil {
 		t.Fatal(err)
 	}
