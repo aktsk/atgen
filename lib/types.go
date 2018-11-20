@@ -9,15 +9,17 @@ type Generator struct {
 type TestFuncs []TestFunc
 
 type TestFunc struct {
-	Name  string
-	Tests []Tester
+	Name       string
+	Tests      []Tester
+	ApiVersion []string
 }
 
 type Test struct {
-	Path   string
-	Method string
-	Req    Req
-	Res    Res
+	ApiVersion []string
+	Path       string
+	Method     string
+	Req        Req
+	Res        Res
 }
 
 type SubTests []Test

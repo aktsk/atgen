@@ -36,6 +36,11 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) TestFuncs {
 	for _, p := range parsed {
 		testFunc := TestFunc{}
 		testFunc.Name = p["name"].(string)
+
+		for _, v := range p["apiVersion"].([]interface{}) {
+			testFunc.ApiVersion = append(testFunc.ApiVersion, v.(string))
+		}
+
 		for _, t := range p["tests"].([]interface{}) {
 			t := t.(map[interface{}]interface{})
 			if t["path"] != nil {
@@ -50,11 +55,17 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) TestFuncs {
 }
 
 func convertToTest(t map[interface{}]interface{}) Test {
+	var apiVersion []string
+	for _, v := range t["apiVersion"].([]interface{}) {
+		apiVersion = append(apiVersion, v.(string))
+	}
+
 	return Test{
-		Path:   t["path"].(string),
-		Method: t["method"].(string),
-		Req:    convertToReq(t["req"]),
-		Res:    convertToRes(t["res"]),
+		ApiVersion: apiVersion,
+		Path:       t["path"].(string),
+		Method:     t["method"].(string),
+		Req:        convertToReq(t["req"]),
+		Res:        convertToRes(t["res"]),
 	}
 }
 
