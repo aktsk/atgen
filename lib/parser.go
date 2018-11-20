@@ -7,19 +7,32 @@ import (
 )
 
 func (g *Generator) ParseYaml() error {
-	var testFuncs TestFuncs
-
 	buf, err := ioutil.ReadFile(g.Yaml)
 	if err != nil {
 		return err
 	}
 
-	var parsed []map[interface{}]interface{}
-	err = yaml.Unmarshal(buf, &parsed)
+	parsed, err := parseYaml(buf)
 	if err != nil {
 		return err
 	}
 
+	g.TestFuncs = convertToTestFuncs(parsed)
+
+	return nil
+}
+
+func parseYaml(buf []byte) ([]map[interface{}]interface{}, error) {
+	var parsed []map[interface{}]interface{}
+	err := yaml.Unmarshal(buf, &parsed)
+	if err != nil {
+		return nil, err
+	}
+	return parsed, nil
+}
+
+func convertToTestFuncs(parsed []map[interface{}]interface{}) TestFuncs {
+	var testFuncs TestFuncs
 	for _, p := range parsed {
 		testFunc := TestFunc{}
 		testFunc.Name = p["name"].(string)
@@ -31,13 +44,9 @@ func (g *Generator) ParseYaml() error {
 				testFunc.Tests = append(testFunc.Tests, convertToSubTests(t))
 			}
 		}
-
 		testFuncs = append(testFuncs, testFunc)
 	}
-
-	g.TestFuncs = testFuncs
-
-	return nil
+	return testFuncs
 }
 
 func convertToTest(t map[interface{}]interface{}) Test {
