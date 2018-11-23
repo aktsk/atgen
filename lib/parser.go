@@ -37,9 +37,9 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) TestFuncs {
 		testFunc := TestFunc{}
 		testFunc.Name = p["name"].(string)
 
-		if p["apiVersion"] != nil {
-			for _, v := range p["apiVersion"].([]interface{}) {
-				testFunc.APIVersion = append(testFunc.APIVersion, v.(string))
+		if p["apiVersions"] != nil {
+			for _, v := range p["apiVersions"].([]interface{}) {
+				testFunc.APIVersions = append(testFunc.APIVersions, v.(string))
 			}
 		}
 
@@ -57,19 +57,19 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) TestFuncs {
 }
 
 func convertToTest(t map[interface{}]interface{}) Test {
-	var apiVersion []string
-	if t["apiVersion"] != nil {
-		for _, v := range t["apiVersion"].([]interface{}) {
-			apiVersion = append(apiVersion, v.(string))
+	var apiVersions []string
+	if t["apiVersions"] != nil {
+		for _, v := range t["apiVersions"].([]interface{}) {
+			apiVersions = append(apiVersions, v.(string))
 		}
 	}
 
 	return Test{
-		APIVersion: apiVersion,
-		Path:       t["path"].(string),
-		Method:     t["method"].(string),
-		Req:        convertToReq(t["req"]),
-		Res:        convertToRes(t["res"]),
+		APIVersions: apiVersions,
+		Path:        t["path"].(string),
+		Method:      t["method"].(string),
+		Req:         convertToReq(t["req"]),
+		Res:         convertToRes(t["res"]),
 	}
 }
 

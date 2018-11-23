@@ -7,6 +7,7 @@ import (
 	"go/parser"
 	"go/printer"
 	"go/token"
+	"io"
 	"os"
 	"strings"
 
@@ -15,6 +16,19 @@ import (
 )
 
 func (g *Generator) Generate() error {
+	tfuncs := filterTestFuncs(g.TestFuncs)
+	for v, t := range tfuncs {
+		f, err := os.Create(fmt.Sprintf("%s_test.go", v))
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		g.generateTestFuncs(v, t, f)
+	}
+	return nil
+}
+
+func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.Writer) error {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, g.Template, nil, parser.ParseComments)
 	if err != nil {
@@ -45,7 +59,7 @@ func (g *Generator) Generate() error {
 	}, nil)
 
 	var tfnodes []ast.Node
-	for _, testFunc := range g.TestFuncs {
+	for _, testFunc := range testFuncs {
 		tfnode := util.DuplicateNode(testFuncNode)
 		tfnode.(*ast.FuncDecl).Name.Name = testFunc.Name
 
@@ -95,9 +109,65 @@ func (g *Generator) Generate() error {
 	}, nil)
 
 	f.Comments = cmap.Filter(f).Comments()
-	printer.Fprint(os.Stdout, fset, f)
+	printer.Fprint(w, fset, f)
 
 	return nil
+}
+
+func filterTestFuncs(testFuncs TestFuncs) map[string]TestFuncs {
+	tfuncs := make(map[string]TestFuncs)
+	for _, testFunc := range testFuncs {
+		for _, version := range getVersions(testFunc) {
+			tfunc := filterTests(testFunc, version)
+			tfuncs[version] = append(tfuncs[version], tfunc)
+		}
+	}
+	return tfuncs
+}
+
+func filterTests(testFunc TestFunc, version string) TestFunc {
+	tfunc := TestFunc{Name: testFunc.Name}
+	for _, t := range testFunc.Tests {
+		test := t.(Test)
+		apiVersions := test.APIVersions
+		test.Path = strings.Replace(test.Path, "{apiVersion}", version, 1)
+		if contains(apiVersions, version) {
+			tfunc.Tests = append(tfunc.Tests, test)
+		} else if apiVersions == nil && contains(testFunc.APIVersions, version) {
+			tfunc.Tests = append(tfunc.Tests, test)
+		}
+	}
+	return tfunc
+}
+
+func contains(s []string, e string) bool {
+	for _, v := range s {
+		if e == v {
+			return true
+		}
+	}
+	return false
+}
+
+func getVersions(testFunc TestFunc) []string {
+	var versions []string
+	versions = append(versions, testFunc.APIVersions...)
+	for _, test := range testFunc.Tests {
+		_ = test
+		versions = append(versions, test.(Test).APIVersions...)
+	}
+
+	// Dedupe versions
+	m := make(map[string]bool)
+	var deduped []string
+	for _, v := range versions {
+		if !m[v] {
+			m[v] = true
+			deduped = append(deduped, v)
+		}
+	}
+
+	return deduped
 }
 
 func rewriteTestNode(n ast.Node, test Test) ast.Node {

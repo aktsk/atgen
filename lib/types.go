@@ -1,25 +1,26 @@
 package atgen
 
 type Generator struct {
-	Yaml      string
-	Template  string
-	TestFuncs TestFuncs
+	Yaml                   string
+	Template               string
+	TestFuncs              TestFuncs
+	TestFuncsPerAPIVersion map[string]TestFuncs
 }
 
 type TestFuncs []TestFunc
 
 type TestFunc struct {
-	Name       string
-	Tests      []Tester
-	APIVersion []string
+	Name        string
+	Tests       []Tester
+	APIVersions []string
 }
 
 type Test struct {
-	APIVersion []string
-	Path       string
-	Method     string
-	Req        Req
-	Res        Res
+	APIVersions []string
+	Path        string
+	Method      string
+	Req         Req
+	Res         Res
 }
 
 type SubTests []Test
