@@ -25,7 +25,7 @@ var commandGen = cli.Command{
 		},
 		cli.StringFlag{
 			Name:  "template",
-			Value: "template.go",
+			Value: "template_test.go",
 			Usage: "template file defines test code",
 		},
 	},
