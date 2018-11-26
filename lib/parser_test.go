@@ -68,113 +68,75 @@ func TestParseTestFuncAndTestPerAPIVersion(t *testing.T) {
 	}
 }
 
-var yamlTestFuncPerAPIVersion = `
-- name: TestFoo
-  apiVersions:
-    - v1beta1
-    - v1beta2
-    - v1
-  vars:
-    adminAPIKey: test
-  tests:
-    - path: /{apiVersion}/money
-      method: post
-      req:
-        params:
-          moneyId: "1"
-          priority: free
-          currency: JPY
-        headers:
-          x-admin-api-key: test
-      res:
-        status: 201
-        headers:
-          location: ""
-        prams:
-          foo: bar
-`
+func TestGetVersionsOfTestFunc(t *testing.T) {
+	parsed, err := parseYaml([]byte(yamlTestFuncPerAPIVersion))
+	if err != nil {
+		t.Fatal(err)
+	}
+	testFuncs := convertToTestFuncs(parsed)
+	versions := getVersions(testFuncs[0])
 
-var yamlTestPerAPIVersion = `
-- name: TestFoo
-  tests:
-    - apiVersions:
-        - v1beta1
-        - v1beta2
-        - v1
-      path: /{apiVersion}/money
-      method: post
-      req:
-        params:
-          moneyId: "1"
-          priority: free
-          currency: JPY
-        headers:
-          x-admin-api-key: test
-      res:
-        status: 201
-        headers:
-          location: ""
-        prams:
-          foo: bar
-    - apiVersions:
-        - v1
-      path: /{apiVersion}/money
-      method: post
-      req:
-        params:
-          moneyId: "1"
-          priority: free
-          currency: JPY
-        headers:
-          x-admin-api-key: test
-      res:
-        status: 201
-        headers:
-          location: ""
-        prams:
-          foo: bar
-`
+	if versions[0] != "v1beta1" {
+		t.Fatalf("versions[0] should be v1beta1")
+	}
 
-var yamlTestFuncAndTestPerAPIVersion = `
-- name: TestFoo
-  apiVersions:
-    - v1beta1
-    - v1beta2
-    - v1
-  tests:
-    - apiVersions:
-        - v1beta1
-        - v1beta2
-      path: /{apiVersion}/money
-      method: post
-      req:
-        params:
-          moneyId: "1"
-          priority: free
-          currency: JPY
-        headers:
-          x-admin-api-key: test
-      res:
-        status: 201
-        headers:
-          location: ""
-        prams:
-          foo: bar
-    - apiVersions:
-        - v1
-      path: /{apiVersion}/user
-      method: post
-      req:
-        params:
-          moneyId: "1"
-          priority: free
-          currency: JPY
-        headers:
-          x-admin-api-key: test
-      res:
-        status: 201
-        headers:
-          location: ""
-        prams:
-          foo: bar
-`
+	if versions[1] != "v1beta2" {
+		t.Fatalf("versions[1] should be v1beta2")
+	}
+
+	if versions[2] != "v1" {
+		t.Fatalf("versions[2] should be v1")
+	}
+}
+
+func TestGetVersionsOfTest(t *testing.T) {
+	parsed, err := parseYaml([]byte(yamlTestPerAPIVersion))
+	if err != nil {
+		t.Fatal(err)
+	}
+	testFuncs := convertToTestFuncs(parsed)
+	versions := getVersions(testFuncs[0])
+
+	if len(versions) != 3 {
+		t.Logf("%#v", versions)
+		t.Fatalf("len(versions) should be 3, but %d", len(versions))
+	}
+
+	if versions[0] != "v1beta1" {
+		t.Fatalf("versions[0] should be v1beta1")
+	}
+
+	if versions[1] != "v1beta2" {
+		t.Fatalf("versions[1] should be v1beta2")
+	}
+
+	if versions[2] != "v1" {
+		t.Fatalf("versions[2] should be v1")
+	}
+}
+
+func TestGetVersionsOfTestFuncAndTest(t *testing.T) {
+	parsed, err := parseYaml([]byte(yamlTestFuncAndTestPerAPIVersion))
+	if err != nil {
+		t.Fatal(err)
+	}
+	testFuncs := convertToTestFuncs(parsed)
+	versions := getVersions(testFuncs[0])
+
+	if len(versions) != 3 {
+		t.Logf("%#v", versions)
+		t.Fatalf("len(versions) should be 3, but %d", len(versions))
+	}
+
+	if versions[0] != "v1beta1" {
+		t.Fatalf("versions[0] should be v1beta1")
+	}
+
+	if versions[1] != "v1beta2" {
+		t.Fatalf("versions[1] should be v1beta2")
+	}
+
+	if versions[2] != "v1" {
+		t.Fatalf("versions[2] should be v1")
+	}
+}

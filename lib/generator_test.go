@@ -4,85 +4,16 @@ import (
 	"testing"
 )
 
-func TestGetVersionsOfTestFunc(t *testing.T) {
-	parsed, err := parseYaml([]byte(yamlTestFuncPerAPIVersion))
-	if err != nil {
-		t.Fatal(err)
-	}
-	testFuncs := convertToTestFuncs(parsed)
-	versions := getVersions(testFuncs[0])
-
-	if versions[0] != "v1beta1" {
-		t.Fatalf("versions[0] should be v1beta1")
-	}
-
-	if versions[1] != "v1beta2" {
-		t.Fatalf("versions[1] should be v1beta2")
-	}
-
-	if versions[2] != "v1" {
-		t.Fatalf("versions[2] should be v1")
-	}
-}
-
-func TestGetVersionsOfTest(t *testing.T) {
-	parsed, err := parseYaml([]byte(yamlTestPerAPIVersion))
-	if err != nil {
-		t.Fatal(err)
-	}
-	testFuncs := convertToTestFuncs(parsed)
-	versions := getVersions(testFuncs[0])
-
-	if len(versions) != 3 {
-		t.Logf("%#v", versions)
-		t.Fatalf("len(versions) should be 3, but %d", len(versions))
-	}
-
-	if versions[0] != "v1beta1" {
-		t.Fatalf("versions[0] should be v1beta1")
-	}
-
-	if versions[1] != "v1beta2" {
-		t.Fatalf("versions[1] should be v1beta2")
-	}
-
-	if versions[2] != "v1" {
-		t.Fatalf("versions[2] should be v1")
-	}
-}
-
-func TestGetVersionsOfTestFuncAndTest(t *testing.T) {
-	parsed, err := parseYaml([]byte(yamlTestFuncAndTestPerAPIVersion))
-	if err != nil {
-		t.Fatal(err)
-	}
-	testFuncs := convertToTestFuncs(parsed)
-	versions := getVersions(testFuncs[0])
-
-	if len(versions) != 3 {
-		t.Logf("%#v", versions)
-		t.Fatalf("len(versions) should be 3, but %d", len(versions))
-	}
-
-	if versions[0] != "v1beta1" {
-		t.Fatalf("versions[0] should be v1beta1")
-	}
-
-	if versions[1] != "v1beta2" {
-		t.Fatalf("versions[1] should be v1beta2")
-	}
-
-	if versions[2] != "v1" {
-		t.Fatalf("versions[2] should be v1")
-	}
-}
-
 func TestFilterTestFunc(t *testing.T) {
 	parsed, err := parseYaml([]byte(yamlTestFuncPerAPIVersion))
 	if err != nil {
 		t.Fatal(err)
 	}
 	tfuncs := filterTestFuncs(convertToTestFuncs(parsed))
+
+	if tfuncs["v1beta1"][0].Vars["adminAPIKey"] != "test" {
+		t.Fatalf(`tfuncs["v1beta1"][0].Vars["adminAPIKey"] should be test`)
+	}
 
 	v1beta1 := tfuncs["v1beta1"][0].Tests[0].(Test)
 	if v1beta1.Path != "/v1beta1/money" {
