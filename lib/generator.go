@@ -88,7 +88,6 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 				ident = v.Name
 			case *ast.CompositeLit:
 				if ident == "vars" {
-					fmt.Printf("%#v", testFunc)
 					h, _ := parser.ParseExpr(fmt.Sprintf("%#v", testFunc.Vars))
 					cr.Replace(h)
 				}
