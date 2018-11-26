@@ -20,6 +20,10 @@ func TestParseTestFuncPerAPIVersion(t *testing.T) {
 	if testFunc.APIVersions[0] != "v1beta1" {
 		t.Fatal("testFunc.APIVersions[0] should be v1beta1")
 	}
+
+	if testFunc.Vars["adminAPIKey"] != "test" {
+		t.Fatal(`testFunc.Vars["adminAPIKey"] should be test`)
+	}
 }
 
 func TestParseTestPerAPIVersion(t *testing.T) {
@@ -70,6 +74,8 @@ var yamlTestFuncPerAPIVersion = `
     - v1beta1
     - v1beta2
     - v1
+  vars:
+    adminAPIKey: test
   tests:
     - path: /{apiVersion}/money
       method: post

@@ -43,6 +43,8 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) TestFuncs {
 			}
 		}
 
+		testFunc.Vars = convertToParams(p["vars"])
+
 		for _, t := range p["tests"].([]interface{}) {
 			t := t.(map[interface{}]interface{})
 			if t["path"] != nil {
