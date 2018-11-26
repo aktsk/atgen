@@ -14,7 +14,7 @@ type TestFunc struct {
 	Name        string
 	Tests       []Tester
 	APIVersions []string
-	Vars        map[string]string
+	Vars        map[string]interface{}
 }
 
 type Test struct {
