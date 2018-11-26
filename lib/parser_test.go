@@ -43,6 +43,11 @@ func TestParseTestPerAPIVersion(t *testing.T) {
 	if test.APIVersions[0] != "v1beta1" {
 		t.Fatal("test.APIVersions[0]")
 	}
+
+	if test.Res.Params["foo"] != "bar" {
+		t.Log(test.Res.Params["foo"])
+		t.Fatal(`test.Res.Params["foo"] should be bar`)
+	}
 }
 
 func TestParseTestFuncAndTestPerAPIVersion(t *testing.T) {

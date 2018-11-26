@@ -23,7 +23,7 @@ var yamlTestFuncPerAPIVersion = `
         status: 201
         headers:
           location: ""
-        prams:
+        params:
           foo: bar
 `
 
@@ -47,7 +47,7 @@ var yamlTestPerAPIVersion = `
         status: 201
         headers:
           location: ""
-        prams:
+        params:
           foo: bar
     - apiVersions:
         - v1
@@ -64,7 +64,7 @@ var yamlTestPerAPIVersion = `
         status: 201
         headers:
           location: ""
-        prams:
+        params:
           foo: bar
 `
 
@@ -91,7 +91,7 @@ var yamlTestFuncAndTestPerAPIVersion = `
         status: 201
         headers:
           location: ""
-        prams:
+        params:
           foo: bar
     - apiVersions:
         - v1
@@ -108,6 +108,6 @@ var yamlTestFuncAndTestPerAPIVersion = `
         status: 201
         headers:
           location: ""
-        prams:
+        params:
           foo: bar
 `
