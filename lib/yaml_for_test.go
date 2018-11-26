@@ -16,6 +16,7 @@ var yamlTestFuncPerAPIVersion = `
           moneyId: "1"
           priority: free
           currency: JPY
+          foo: true
         headers:
           x-admin-api-key: test
       res:

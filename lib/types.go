@@ -28,13 +28,13 @@ type Test struct {
 type SubTests []Test
 
 type Req struct {
-	Params  map[string]string
+	Params  map[string]interface{}
 	Headers map[string]string
 }
 
 type Res struct {
 	Status  int
-	Params  map[string]string
+	Params  map[string]interface{}
 	Headers map[string]string
 }
 

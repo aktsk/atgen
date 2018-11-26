@@ -43,7 +43,7 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) TestFuncs {
 			}
 		}
 
-		testFunc.Vars = convertToParams(p["vars"])
+		testFunc.Vars = convertToVars(p["vars"])
 
 		for _, t := range p["tests"].([]interface{}) {
 			t := t.(map[interface{}]interface{})
@@ -103,11 +103,16 @@ func convertToRes(r interface{}) Res {
 	}
 }
 
-func convertToParams(p interface{}) map[string]string {
-	params := make(map[string]string)
+func convertToParams(p interface{}) map[string]interface{} {
+	params := make(map[string]interface{})
 	if p != nil {
 		for k, v := range p.(map[interface{}]interface{}) {
-			params[k.(string)] = v.(string)
+			switch t := v.(type) {
+			case string:
+				params[k.(string)] = t
+			case bool:
+				params[k.(string)] = t
+			}
 		}
 	}
 	return params
@@ -121,4 +126,14 @@ func convertToHeaders(h interface{}) map[string]string {
 		}
 	}
 	return headers
+}
+
+func convertToVars(p interface{}) map[string]string {
+	params := make(map[string]string)
+	if p != nil {
+		for k, v := range p.(map[interface{}]interface{}) {
+			params[k.(string)] = v.(string)
+		}
+	}
+	return params
 }
