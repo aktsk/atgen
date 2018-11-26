@@ -171,9 +171,7 @@ func getVersions(testFunc TestFunc) []string {
 }
 
 func rewriteTestNode(n ast.Node, test Test) ast.Node {
-	rewriteReqHeaders := false
-	rewriteResHeaders := false
-	rewriteResParams := false
+	var ident string
 	astutil.Apply(n, func(cr *astutil.Cursor) bool {
 		switch v := cr.Node().(type) {
 		case *ast.BasicLit:
@@ -187,30 +185,19 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 				v.Value = fmt.Sprintf("`%s`", params)
 			}
 		case *ast.Ident:
-			if v.Name == "reqHeaders" {
-				rewriteReqHeaders = true
-				rewriteResHeaders = false
-				rewriteResParams = false
-			} else if v.Name == "resHeaders" {
-				rewriteReqHeaders = false
-				rewriteResHeaders = true
-				rewriteResParams = false
-			} else if v.Name == "resParams" {
-				rewriteReqHeaders = false
-				rewriteResHeaders = false
-				rewriteResParams = true
-			}
+			ident = v.Name
 		case *ast.CompositeLit:
-			if rewriteReqHeaders {
+			if ident == "reqHeaders" {
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Req.Headers))
 				cr.Replace(h)
-			} else if rewriteResHeaders {
+			} else if ident == "resHeaders" {
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Headers))
 				cr.Replace(h)
-			} else if rewriteResParams {
+			} else if ident == "resParams" {
 				p, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Params))
 				cr.Replace(p)
 			}
+			ident = ""
 		}
 		return true
 	}, nil)
