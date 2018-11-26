@@ -9,6 +9,7 @@ import (
 	"go/token"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
 	util "github.com/lkesteloot/astutil"
@@ -18,7 +19,8 @@ import (
 func (g *Generator) Generate() error {
 	tfuncs := filterTestFuncs(g.TestFuncs)
 	for v, t := range tfuncs {
-		f, err := os.Create(fmt.Sprintf("%s_test.go", v))
+		out := filepath.Join(g.Dir, fmt.Sprintf("%s_test.go", v))
+		f, err := os.Create(out)
 		if err != nil {
 			return err
 		}
@@ -195,6 +197,8 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 			case "`reqParams`":
 				params, _ := json.Marshal(test.Req.Params)
 				v.Value = fmt.Sprintf("`%s`", params)
+			case `"status"`:
+				v.Value = fmt.Sprintf("%d", test.Res.Status)
 			}
 		case *ast.Ident:
 			ident = v.Name

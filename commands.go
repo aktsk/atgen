@@ -28,6 +28,11 @@ var commandGen = cli.Command{
 			Value: "template_test.go",
 			Usage: "template file defines test code",
 		},
+		cli.StringFlag{
+			Name:  "dir",
+			Value: ".",
+			Usage: "output directory to write generated test files",
+		},
 	},
 }
 
@@ -35,6 +40,7 @@ func doGen(c *cli.Context) error {
 	generator := atgen.Generator{
 		Yaml:     c.String("yaml"),
 		Template: c.String("template"),
+		Dir:      c.String("dir"),
 	}
 
 	err := generator.ParseYaml()
