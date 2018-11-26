@@ -74,6 +74,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 
 		}
 
+		var ident string
 		astutil.Apply(tfnode, func(cr *astutil.Cursor) bool {
 			switch v := cr.Node().(type) {
 			case *ast.BlockStmt:
@@ -83,6 +84,15 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 					}
 					cr.Delete()
 				}
+			case *ast.Ident:
+				ident = v.Name
+			case *ast.CompositeLit:
+				if ident == "vars" {
+					fmt.Printf("%#v", testFunc)
+					h, _ := parser.ParseExpr(fmt.Sprintf("%#v", testFunc.Vars))
+					cr.Replace(h)
+				}
+				ident = ""
 			}
 
 			return true
@@ -126,7 +136,10 @@ func filterTestFuncs(testFuncs TestFuncs) map[string]TestFuncs {
 }
 
 func filterTests(testFunc TestFunc, version string) TestFunc {
-	tfunc := TestFunc{Name: testFunc.Name}
+	tfunc := TestFunc{
+		Name: testFunc.Name,
+		Vars: testFunc.Vars,
+	}
 	for _, t := range testFunc.Tests {
 		test := t.(Test)
 		apiVersions := test.APIVersions
