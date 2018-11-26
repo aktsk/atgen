@@ -116,9 +116,7 @@ func convertToParams(p interface{}) map[string]interface{} {
 	if p != nil {
 		for k, v := range p.(map[interface{}]interface{}) {
 			switch t := v.(type) {
-			case string:
-				params[k.(string)] = t
-			case bool:
+			case string, bool, int:
 				params[k.(string)] = t
 			}
 		}
