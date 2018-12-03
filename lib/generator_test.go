@@ -71,3 +71,20 @@ func TestFilterTestFuncAndTest(t *testing.T) {
 		t.Fatalf("path should be /v1/user, but %s", v1.Path)
 	}
 }
+
+func TestFilterTestFuncAndSubtests(t *testing.T) {
+	parsed, err := parseYaml([]byte(yamlTestFuncWithSubtests))
+	if err != nil {
+		t.Fatal(err)
+	}
+	tfuncs := filterTestFuncs(convertToTestFuncs(parsed))
+
+	subtest := tfuncs["v1"][0].Tests[2].(Subtests)[0]
+	if subtest.Name != "SubFoo" {
+		t.Fatal("subtest.Name should be SubFoo")
+	}
+
+	if subtest.Tests[0].Path != "/v1/money/1/sub" {
+		t.Fatal("subtest.Tests[0].Path should be /v1/money/1/sub")
+	}
+}

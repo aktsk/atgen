@@ -28,8 +28,9 @@ type Test struct {
 type Subtests []Subtest
 
 type Subtest struct {
-	Name  string
-	Tests []Test
+	Name        string
+	Tests       []Test
+	APIVersions []string
 }
 
 type Req struct {

@@ -142,16 +142,48 @@ func filterTests(testFunc TestFunc, version string) TestFunc {
 		Vars: testFunc.Vars,
 	}
 	for _, t := range testFunc.Tests {
-		test := t.(Test)
-		apiVersions := test.APIVersions
-		test.Path = strings.Replace(test.Path, "{apiVersion}", version, 1)
-		if contains(apiVersions, version) {
-			tfunc.Tests = append(tfunc.Tests, test)
-		} else if apiVersions == nil && contains(testFunc.APIVersions, version) {
-			tfunc.Tests = append(tfunc.Tests, test)
+		switch v := t.(type) {
+		case Test:
+			test := filterTest(v, testFunc.APIVersions, version)
+			if test != nil {
+				tfunc.Tests = append(tfunc.Tests, *test)
+			}
+		case Subtests:
+			subtests := Subtests{}
+			for _, s := range v {
+				subtest := Subtest{Name: s.Name}
+				if s.APIVersions != nil && !contains(s.APIVersions, version) {
+					continue
+				}
+				if s.APIVersions == nil && !contains(testFunc.APIVersions, version) {
+					continue
+				}
+				for _, t := range s.Tests {
+					test := filterTest(t, testFunc.APIVersions, version)
+					if test != nil {
+						subtest.Tests = append(subtest.Tests, *test)
+					}
+				}
+				subtests = append(subtests, subtest)
+			}
+			tfunc.Tests = append(tfunc.Tests, subtests)
 		}
 	}
 	return tfunc
+}
+
+func filterTest(test Test, versions []string, version string) *Test {
+	apiVersions := test.APIVersions
+	test.Path = strings.Replace(test.Path, "{apiVersion}", version, 1)
+	if contains(apiVersions, version) {
+		return &test
+	}
+
+	if apiVersions == nil && contains(versions, version) {
+		return &test
+	}
+
+	return nil
 }
 
 func contains(s []string, e string) bool {
@@ -167,8 +199,10 @@ func getVersions(testFunc TestFunc) []string {
 	var versions []string
 	versions = append(versions, testFunc.APIVersions...)
 	for _, test := range testFunc.Tests {
-		_ = test
-		versions = append(versions, test.(Test).APIVersions...)
+		switch v := test.(type) {
+		case Test:
+			versions = append(versions, v.APIVersions...)
+		}
 	}
 
 	// Dedupe versions
