@@ -73,6 +73,38 @@ func TestParseTestFuncAndTestPerAPIVersion(t *testing.T) {
 	}
 }
 
+func TestParseTestFuncWithSubtests(t *testing.T) {
+	parsed, err := parseYaml([]byte(yamlTestFuncWithSubtests))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testFuncs := convertToTestFuncs(parsed)
+	testFunc := testFuncs[0]
+
+	if testFunc.Name != "TestWithSubtests" {
+		t.Fatal("testFunc.Name should be TestFoo")
+	}
+
+	if testFunc.APIVersions[0] != "v1" {
+		t.Fatal("testFunc.APIVersions[0] should be v1beta1")
+	}
+
+	subtest := testFunc.Tests[2].(Subtests)[0]
+	if subtest.Name != "SubFoo" {
+		t.Fatal("subtest.Name should be SubFoo")
+	}
+
+	test := subtest.Tests[0]
+	if test.Path != "/{apiVersion}/money/1/sub" {
+		t.Fatal("test.Path should be /{apiVersion}/money/1/sub")
+	}
+
+	if test.Method != "delete" {
+		t.Fatal("test.Method should be delete")
+	}
+}
+
 func TestGetVersionsOfTestFunc(t *testing.T) {
 	parsed, err := parseYaml([]byte(yamlTestFuncPerAPIVersion))
 	if err != nil {

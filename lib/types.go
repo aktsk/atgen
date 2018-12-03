@@ -25,7 +25,12 @@ type Test struct {
 	Res         Res
 }
 
-type SubTests []Test
+type Subtests []Subtest
+
+type Subtest struct {
+	Name  string
+	Tests []Test
+}
 
 type Req struct {
 	Params  map[string]interface{}
@@ -46,6 +51,6 @@ func (t Test) IsSubtests() bool {
 	return false
 }
 
-func (t SubTests) IsSubtests() bool {
+func (t Subtests) IsSubtests() bool {
 	return true
 }

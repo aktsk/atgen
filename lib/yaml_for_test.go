@@ -111,3 +111,45 @@ var yamlTestFuncAndTestPerAPIVersion = `
         params:
           foo: bar
 `
+
+var yamlTestFuncWithSubtests = `
+- name: TestWithSubtests
+  apiVersions:
+    - v1
+  tests:
+    - path: /{apiVersion}/money
+      method: post
+      req:
+        params:
+          moneyId: "1"
+          priority: free
+          currency: JPY
+      res:
+        status: 201
+    - path: /{apiVersion}/money/1
+      method: get
+      res:
+        status: 200
+        params:
+          isFoo: true
+          isBar: false
+    - subtests:
+        - name: SubFoo
+          tests:
+            - path: /{apiVersion}/money/1/sub
+              method: delete
+              res:
+                status: 204
+            - path: /{apiVersion}/money/1
+              method: get
+              res:
+                status: 200
+                params:
+                  isFoo: false
+            - path: /{apiVersion}/money/2/sub
+              method: delete
+              res:
+                status: 404
+                params:
+                  foo: bar
+`

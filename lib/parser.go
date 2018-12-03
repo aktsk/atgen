@@ -50,7 +50,7 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) TestFuncs {
 			if t["path"] != nil {
 				testFunc.Tests = append(testFunc.Tests, convertToTest(t))
 			} else {
-				testFunc.Tests = append(testFunc.Tests, convertToSubTests(t))
+				testFunc.Tests = append(testFunc.Tests, convertToSubtests(t))
 			}
 		}
 		testFuncs = append(testFuncs, testFunc)
@@ -75,14 +75,18 @@ func convertToTest(t map[interface{}]interface{}) Test {
 	}
 }
 
-func convertToSubTests(s map[interface{}]interface{}) SubTests {
-	subTests := SubTests{}
+func convertToSubtests(s map[interface{}]interface{}) Subtests {
+	subTests := Subtests{}
 
-	for _, t := range s["subtests"].([]interface{}) {
-		test := convertToTest(t.(map[interface{}]interface{}))
-		subTests = append(subTests, test)
+	for _, s := range s["subtests"].([]interface{}) {
+		s := s.(map[interface{}]interface{})
+		subtest := Subtest{Name: s["name"].(string)}
+		for _, t := range s["tests"].([]interface{}) {
+			t := t.(map[interface{}]interface{})
+			subtest.Tests = append(subtest.Tests, convertToTest(t))
+		}
+		subTests = append(subTests, subtest)
 	}
-
 	return subTests
 }
 
