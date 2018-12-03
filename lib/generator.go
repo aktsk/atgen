@@ -40,6 +40,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 	var (
 		testFuncNode ast.Node
 		testNode     ast.Node
+		subtestNode  ast.Node
 	)
 
 	cmap := ast.NewCommentMap(fset, f, f.Comments)
@@ -49,12 +50,14 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 				testFuncNode = node
 			} else if strings.Contains(cgroup.Text(), "Test block") {
 				testNode = node
+			} else if strings.Contains(cgroup.Text(), "Subtest block") {
+				subtestNode = node
 			}
 		}
 	}
 
 	astutil.Apply(testFuncNode, func(cr *astutil.Cursor) bool {
-		if cr.Node() == testNode {
+		if cr.Node() == testNode || cr.Node() == subtestNode {
 			cr.Delete()
 		}
 		return true
@@ -66,14 +69,36 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 		tfnode.(*ast.FuncDecl).Name.Name = testFunc.Name
 
 		var tnodes []ast.Node
-		for _, test := range testFunc.Tests {
-			var tnode ast.Node
-			if !test.IsSubtests() {
-				tnode = util.DuplicateNode(testNode)
-				tnode = rewriteTestNode(tnode, test.(Test))
-			}
-			tnodes = append(tnodes, tnode)
+		for _, t := range testFunc.Tests {
+			switch test := t.(type) {
+			case Test:
+				tnode := util.DuplicateNode(testNode)
+				tnode = rewriteTestNode(tnode, test)
+				tnodes = append(tnodes, tnode)
+			case Subtests:
+				for _, subtest := range test {
+					subtnode := util.DuplicateNode(subtestNode)
+					astutil.Apply(subtnode, func(cr *astutil.Cursor) bool {
+						switch v := cr.Node().(type) {
+						case *ast.BasicLit:
+							switch v.Value {
+							case `"SubtestName"`:
+								v.Value = fmt.Sprintf(`"%s"`, subtest.Name)
+							}
+						}
+						return true
+					}, nil)
 
+					var tests []ast.Node
+					for _, test := range subtest.Tests {
+						tnode := util.DuplicateNode(testNode)
+						tnode = rewriteTestNode(tnode, test)
+						tests = append(tests, tnode)
+					}
+					subtnode = rewriteSubtestNode(subtnode, tests)
+					tnodes = append(tnodes, subtnode)
+				}
+			}
 		}
 
 		var ident string
@@ -123,6 +148,23 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 	printer.Fprint(w, fset, f)
 
 	return nil
+}
+
+func rewriteSubtestNode(subtest ast.Node, tests []ast.Node) ast.Node {
+	astutil.Apply(subtest, func(cr *astutil.Cursor) bool {
+		switch v := cr.Node().(type) {
+		case *ast.BlockStmt:
+			if v.List == nil {
+				for _, n := range tests {
+					cr.InsertBefore(n)
+				}
+				cr.Delete()
+			}
+		}
+		return true
+	}, nil)
+
+	return subtest
 }
 
 func filterTestFuncs(testFuncs TestFuncs) map[string]TestFuncs {
