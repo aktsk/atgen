@@ -17,9 +17,14 @@ import (
 )
 
 func (g *Generator) Generate() error {
+	base := getFileNameWithoutExt(g.Yaml)
+	if !strings.HasSuffix(base, "_test") {
+		base = base + "_test"
+	}
+
 	tfuncs := filterTestFuncs(g.TestFuncs)
 	for v, t := range tfuncs {
-		out := filepath.Join(g.Dir, fmt.Sprintf("%s_test.go", v))
+		out := filepath.Join(g.Dir, fmt.Sprintf("%s_%s.go", v, base))
 		f, err := os.Create(out)
 		if err != nil {
 			return err
@@ -28,6 +33,10 @@ func (g *Generator) Generate() error {
 		g.generateTestFuncs(v, t, f)
 	}
 	return nil
+}
+
+func getFileNameWithoutExt(path string) string {
+	return filepath.Base(path[:len(path)-len(filepath.Ext(path))])
 }
 
 func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.Writer) error {

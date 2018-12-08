@@ -1,6 +1,8 @@
 package main
 
 import (
+	"path/filepath"
+
 	atgen "github.com/mizzy/atgen/lib"
 	"github.com/urfave/cli"
 )
@@ -19,12 +21,12 @@ var commandGen = cli.Command{
 	Action: doGen,
 	Flags: []cli.Flag{
 		cli.StringFlag{
-			Name:  "yaml",
-			Value: "tests.yml",
-			Usage: "yaml file defines requests and responses for testing",
+			Name:  "yamlDir",
+			Value: ".",
+			Usage: "directory that has test definition yaml files",
 		},
 		cli.StringFlag{
-			Name:  "template",
+			Name:  "templateFile",
 			Value: "template_test.go",
 			Usage: "template file defines test code",
 		},
@@ -37,21 +39,28 @@ var commandGen = cli.Command{
 }
 
 func doGen(c *cli.Context) error {
-	generator := atgen.Generator{
-		Yaml:     c.String("yaml"),
-		Template: c.String("template"),
-		Dir:      c.String("dir"),
-	}
-
-	err := generator.ParseYaml()
+	files, err := filepath.Glob(filepath.Join(c.String("yamlDir"), "*.y*ml"))
 	if err != nil {
 		return err
 	}
 
-	err = generator.Generate()
-	if err != nil {
-		return err
+	for _, file := range files {
+		generator := atgen.Generator{
+			Yaml:     file,
+			Template: c.String("templateFile"),
+			Dir:      c.String("dir"),
+		}
+
+		err := generator.ParseYaml()
+		if err != nil {
+			return err
+		}
+
+		err = generator.Generate()
+		if err != nil {
+			return err
+		}
 	}
 
-	return err
+	return nil
 }
