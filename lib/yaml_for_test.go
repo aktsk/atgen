@@ -8,6 +8,8 @@ var yamlTestFuncPerAPIVersion = `
     - v1
   vars:
     adminAPIKey: test
+    foo:
+      bar: baz
   tests:
     - path: /{apiVersion}/money
       method: post

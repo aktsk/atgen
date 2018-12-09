@@ -24,6 +24,10 @@ func TestParseTestFuncPerAPIVersion(t *testing.T) {
 	if testFunc.Vars["adminAPIKey"] != "test" {
 		t.Fatal(`testFunc.Vars["adminAPIKey"] should be test`)
 	}
+
+	if testFunc.Vars["foo"].(map[string]interface{})["bar"] != "baz" {
+		t.Fatal(`testFunc.Vars["foo"]["bar"] should be baz`)
+	}
 }
 
 func TestParseTestPerAPIVersion(t *testing.T) {
