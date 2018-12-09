@@ -302,5 +302,19 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 		}
 		return true
 	}, nil)
+
+	astutil.Apply(n, func(cr *astutil.Cursor) bool {
+		switch v := cr.Node().(type) {
+		case *ast.BasicLit:
+			if strings.HasPrefix(v.Value, `"${`) {
+				s := strings.TrimLeft(v.Value, `"${`)
+				s = strings.TrimRight(s, `}"`)
+				t := strings.Split(s, ":")
+				v.Value = fmt.Sprintf(`vars["%s"].(%s)`, t[0], t[1])
+			}
+		}
+		return true
+	}, nil)
+
 	return n
 }
