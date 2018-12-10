@@ -124,6 +124,11 @@ func convertToParams(p interface{}) map[string]interface{} {
 				params[k.(string)] = t
 			case map[interface{}]interface{}:
 				params[k.(string)] = convertToParams(t)
+			case []interface{}:
+				params[k.(string)] = []map[string]interface{}{}
+				for _, v := range t {
+					params[k.(string)] = append(params[k.(string)].([]map[string]interface{}), convertToParams(v))
+				}
 			}
 		}
 	}
