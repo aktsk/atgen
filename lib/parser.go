@@ -76,6 +76,7 @@ func convertToTest(t map[interface{}]interface{}) Test {
 		Method:      t["method"].(string),
 		Req:         convertToReq(t["req"]),
 		Res:         convertToRes(t["res"]),
+		Vars:        convertToParams(t["vars"]),
 	}
 }
 

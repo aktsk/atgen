@@ -23,6 +23,7 @@ type Test struct {
 	Method      string
 	Req         Req
 	Res         Res
+	Vars        map[string]interface{}
 }
 
 type Subtests []Subtest

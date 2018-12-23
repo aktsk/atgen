@@ -28,6 +28,11 @@ func TestParseTestFuncPerAPIVersion(t *testing.T) {
 	if testFunc.Vars["foo"].(map[string]interface{})["bar"] != "baz" {
 		t.Fatal(`testFunc.Vars["foo"]["bar"] should be baz`)
 	}
+
+	test := testFunc.Tests[0].(Test)
+	if test.Vars["foo"] != "bar" {
+		t.Fatal(`test.Vars["foo"] should be bar`)
+	}
 }
 
 func TestParseTestPerAPIVersion(t *testing.T) {
@@ -106,6 +111,10 @@ func TestParseTestFuncWithSubtests(t *testing.T) {
 
 	if test.Method != "delete" {
 		t.Fatal("test.Method should be delete")
+	}
+
+	if test.Vars["foo"] != "bar" {
+		t.Fatal(`test.Vars["foo"] should be bar`)
 	}
 }
 

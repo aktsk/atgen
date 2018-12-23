@@ -27,6 +27,8 @@ var yamlTestFuncPerAPIVersion = `
           location: ""
         params:
           foo: bar
+      vars:
+         foo: bar
 `
 
 var yamlTestPerAPIVersion = `
@@ -142,6 +144,8 @@ var yamlTestFuncWithSubtests = `
               method: delete
               res:
                 status: 204
+              vars:
+                foo: bar
             - path: /{apiVersion}/money/1
               method: get
               res:

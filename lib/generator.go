@@ -297,7 +297,11 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 			} else if ident == "resParams" {
 				p, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Params))
 				cr.Replace(p)
+			} else if ident == "testVars" {
+				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Vars))
+				cr.Replace(h)
 			}
+
 			ident = ""
 		}
 		return true
