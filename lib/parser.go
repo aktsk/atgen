@@ -34,6 +34,10 @@ func parseYaml(buf []byte) ([]map[interface{}]interface{}, error) {
 func convertToTestFuncs(parsed []map[interface{}]interface{}) TestFuncs {
 	var testFuncs TestFuncs
 	for _, p := range parsed {
+		if p["name"] == nil {
+			continue
+		}
+
 		testFunc := TestFunc{}
 		testFunc.Name = p["name"].(string)
 
