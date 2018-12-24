@@ -1,7 +1,6 @@
 package atgen
 
 import (
-	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -279,9 +278,6 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 				v.Value = fmt.Sprintf(`"%s"`, strings.ToUpper(test.Method))
 			case `"Path"`:
 				v.Value = fmt.Sprintf(`"%s"`, test.Path)
-			case "`reqParams`":
-				params, _ := json.Marshal(test.Req.Params)
-				v.Value = fmt.Sprintf("`%s`", params)
 			case `"status"`:
 				v.Value = fmt.Sprintf("%d", test.Res.Status)
 			}
@@ -291,6 +287,9 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 			if ident == "reqHeaders" {
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Req.Headers))
 				cr.Replace(h)
+			} else if ident == "reqParams" {
+				p, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Req.Params))
+				cr.Replace(p)
 			} else if ident == "resHeaders" {
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Headers))
 				cr.Replace(h)
