@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	util "github.com/lkesteloot/astutil"
+	"github.com/pkg/errors"
 	"golang.org/x/tools/go/ast/astutil"
 )
 
@@ -26,7 +27,7 @@ func (g *Generator) Generate() error {
 		out := filepath.Join(g.OutputDir, fmt.Sprintf("%s_%s.go", v, base))
 		f, err := os.Create(out)
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 		defer f.Close()
 		g.generateTestFuncs(v, t, f)
@@ -42,7 +43,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, g.Template, nil, parser.ParseComments)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	var (

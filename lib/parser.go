@@ -3,18 +3,19 @@ package atgen
 import (
 	"io/ioutil"
 
+	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )
 
 func (g *Generator) ParseYaml() error {
 	buf, err := ioutil.ReadFile(g.Yaml)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	parsed, err := parseYaml(buf)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	g.TestFuncs = convertToTestFuncs(parsed)
@@ -26,7 +27,7 @@ func parseYaml(buf []byte) ([]map[interface{}]interface{}, error) {
 	var parsed []map[interface{}]interface{}
 	err := yaml.Unmarshal(buf, &parsed)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	return parsed, nil
 }
