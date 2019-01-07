@@ -1,0 +1,39 @@
+- name: TestGetPerson
+  apiVersions:
+    - v1
+  tests:
+    - path: /{apiVersion}/people/1
+      method: get
+      res:
+        status: 200
+        params:
+          id: "1"
+          firstname: John
+          lastname: Doe
+
+- name: TestPostAndDeletePerson
+  apiVersions:
+    - v1
+  tests:
+    - path: /{apiVersion}/people/3
+      method: post
+      req:
+        params:
+          firstname: Jane
+          lastname: Doe
+      res:
+        status: 200
+    - path: /{apiVersion}/people/3
+      method: get
+      res:
+        status: 200
+        params:
+          firstname: Jane
+    - path: /{apiVersion}/people/3
+      method: delete
+      res:
+        status: 200
+    - path: /{apiVersion}/people/3
+      method: get
+      res:
+        status: 404
