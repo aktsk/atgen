@@ -11,18 +11,18 @@ func TestFilterTestFunc(t *testing.T) {
 	}
 	tfuncs := filterTestFuncs(convertToTestFuncs(parsed))
 
-	if tfuncs["v1beta1"][0].Vars["adminAPIKey"] != "test" {
-		t.Fatalf(`tfuncs["v1beta1"][0].Vars["adminAPIKey"] should be test`)
+	if tfuncs["v1beta1"][0].Vars["key"] != "val" {
+		t.Fatalf(`tfuncs["v1beta1"][0].Vars["key"] should be val`)
 	}
 
 	v1beta1 := tfuncs["v1beta1"][0].Tests[0].(Test)
-	if v1beta1.Path != "/v1beta1/money" {
-		t.Fatalf("path should be /v1beta1/money, but %s", v1beta1.Path)
+	if v1beta1.Path != "/v1beta1/user" {
+		t.Fatalf("path should be /v1beta1/user, but %s", v1beta1.Path)
 	}
 
 	v1beta2 := tfuncs["v1beta2"][0].Tests[0].(Test)
-	if v1beta2.Path != "/v1beta2/money" {
-		t.Fatalf("path should be /v1beta2/money, but %s", v1beta2.Path)
+	if v1beta2.Path != "/v1beta2/user" {
+		t.Fatalf("path should be /v1beta2/user, but %s", v1beta2.Path)
 	}
 }
 
@@ -34,13 +34,13 @@ func TestFilterTest(t *testing.T) {
 	tfuncs := filterTestFuncs(convertToTestFuncs(parsed))
 
 	v1beta1 := tfuncs["v1beta1"][0].Tests[0].(Test)
-	if v1beta1.Path != "/v1beta1/money" {
-		t.Fatalf("path should be /v1beta1/money, but %s", v1beta1.Path)
+	if v1beta1.Path != "/v1beta1/user" {
+		t.Fatalf("path should be /v1beta1/user, but %s", v1beta1.Path)
 	}
 
 	v1beta2 := tfuncs["v1beta2"][0].Tests[0].(Test)
-	if v1beta2.Path != "/v1beta2/money" {
-		t.Fatalf("path should be /v1beta2/money, but %s", v1beta2.Path)
+	if v1beta2.Path != "/v1beta2/user" {
+		t.Fatalf("path should be /v1beta2/user, but %s", v1beta2.Path)
 	}
 }
 
@@ -52,8 +52,8 @@ func TestFilterTestFuncAndTest(t *testing.T) {
 	tfuncs := filterTestFuncs(convertToTestFuncs(parsed))
 
 	v1beta1 := tfuncs["v1beta1"][0].Tests[0].(Test)
-	if v1beta1.Path != "/v1beta1/money" {
-		t.Fatalf("path should be /v1beta1/money, but %s", v1beta1.Path)
+	if v1beta1.Path != "/v1beta1/user" {
+		t.Fatalf("path should be /v1beta1/user, but %s", v1beta1.Path)
 	}
 
 	n := len(tfuncs["v1beta1"][0].Tests)
@@ -62,8 +62,8 @@ func TestFilterTestFuncAndTest(t *testing.T) {
 	}
 
 	v1beta2 := tfuncs["v1beta2"][0].Tests[0].(Test)
-	if v1beta2.Path != "/v1beta2/money" {
-		t.Fatalf("path should be /v1beta2/money, but %s", v1beta2.Path)
+	if v1beta2.Path != "/v1beta2/user" {
+		t.Fatalf("path should be /v1beta2/user, but %s", v1beta2.Path)
 	}
 
 	v1 := tfuncs["v1"][0].Tests[0].(Test)
@@ -84,7 +84,7 @@ func TestFilterTestFuncAndSubtests(t *testing.T) {
 		t.Fatal("subtest.Name should be SubFoo")
 	}
 
-	if subtest.Tests[0].Path != "/v1/money/1/sub" {
-		t.Fatal("subtest.Tests[0].Path should be /v1/money/1/sub")
+	if subtest.Tests[0].Path != "/v1/user/1/foo" {
+		t.Fatal("subtest.Tests[0].Path should be /v1/user/1/foo")
 	}
 }

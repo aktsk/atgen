@@ -7,24 +7,21 @@ var yamlTestFuncPerAPIVersion = `
     - v1beta2
     - v1
   vars:
-    adminAPIKey: test
+    key: val
     foo:
       bar: baz
   tests:
-    - path: /{apiVersion}/money
+    - path: /{apiVersion}/user
       method: post
       req:
         params:
-          moneyId: "1"
-          priority: free
-          currency: JPY
+          userId: "1"
+          name: John
           foo: true
         headers:
-          x-admin-api-key: test
+          x-api-key: test
       res:
         status: 201
-        headers:
-          location: ""
         params:
           foo: bar
       vars:
@@ -38,36 +35,30 @@ var yamlTestPerAPIVersion = `
         - v1beta1
         - v1beta2
         - v1
-      path: /{apiVersion}/money
+      path: /{apiVersion}/user
       method: post
       req:
         params:
-          moneyId: "1"
-          priority: free
-          currency: JPY
+          userId: "1"
+          name: John
         headers:
-          x-admin-api-key: test
+          x-api-key: test
       res:
         status: 201
-        headers:
-          location: ""
         params:
           foo: bar
     - apiVersions:
         - v1
-      path: /{apiVersion}/money
+      path: /{apiVersion}/user
       method: post
       req:
         params:
-          moneyId: "1"
-          priority: free
-          currency: JPY
+          userId: "1"
+          name: John
         headers:
-          x-admin-api-key: test
+          x-api-key: test
       res:
         status: 201
-        headers:
-          location: ""
         params:
           foo: bar
 `
@@ -82,19 +73,16 @@ var yamlTestFuncAndTestPerAPIVersion = `
     - apiVersions:
         - v1beta1
         - v1beta2
-      path: /{apiVersion}/money
+      path: /{apiVersion}/user
       method: post
       req:
         params:
-          moneyId: "1"
-          priority: free
-          currency: JPY
+          userId: "1"
+          name: John
         headers:
-          x-admin-api-key: test
+          x-api-key: test
       res:
         status: 201
-        headers:
-          location: ""
         params:
           foo: bar
     - apiVersions:
@@ -103,15 +91,12 @@ var yamlTestFuncAndTestPerAPIVersion = `
       method: post
       req:
         params:
-          moneyId: "1"
-          priority: free
-          currency: JPY
+          userId: "1"
+          name: John
         headers:
-          x-admin-api-key: test
+          x-api-key: test
       res:
         status: 201
-        headers:
-          location: ""
         params:
           foo: bar
 `
@@ -121,16 +106,15 @@ var yamlTestFuncWithSubtests = `
   apiVersions:
     - v1
   tests:
-    - path: /{apiVersion}/money
+    - path: /{apiVersion}/user
       method: post
       req:
         params:
-          moneyId: "1"
-          priority: free
-          currency: JPY
+          userId: "1"
+          name: John
       res:
         status: 201
-    - path: /{apiVersion}/money/1
+    - path: /{apiVersion}/user/1
       method: get
       res:
         status: 200
@@ -140,19 +124,19 @@ var yamlTestFuncWithSubtests = `
     - subtests:
         - name: SubFoo
           tests:
-            - path: /{apiVersion}/money/1/sub
+            - path: /{apiVersion}/user/1/foo
               method: delete
               res:
                 status: 204
               vars:
                 foo: bar
-            - path: /{apiVersion}/money/1
+            - path: /{apiVersion}/user/1
               method: get
               res:
                 status: 200
                 params:
                   isFoo: false
-            - path: /{apiVersion}/money/2/sub
+            - path: /{apiVersion}/user/2/foo
               method: delete
               res:
                 status: 404

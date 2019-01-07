@@ -21,8 +21,8 @@ func TestParseTestFuncPerAPIVersion(t *testing.T) {
 		t.Fatal("testFunc.APIVersions[0] should be v1beta1")
 	}
 
-	if testFunc.Vars["adminAPIKey"] != "test" {
-		t.Fatal(`testFunc.Vars["adminAPIKey"] should be test`)
+	if testFunc.Vars["key"] != "val" {
+		t.Fatal(`testFunc.Vars["key"] should be val`)
 	}
 
 	if testFunc.Vars["foo"].(map[string]interface{})["bar"] != "baz" {
@@ -105,8 +105,8 @@ func TestParseTestFuncWithSubtests(t *testing.T) {
 	}
 
 	test := subtest.Tests[0]
-	if test.Path != "/{apiVersion}/money/1/sub" {
-		t.Fatal("test.Path should be /{apiVersion}/money/1/sub")
+	if test.Path != "/{apiVersion}/user/1/foo" {
+		t.Fatal("test.Path should be /{apiVersion}/user/1/foo")
 	}
 
 	if test.Method != "delete" {
