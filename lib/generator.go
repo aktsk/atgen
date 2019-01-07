@@ -66,9 +66,14 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 	}
 
 	astutil.Apply(testFuncNode, func(cr *astutil.Cursor) bool {
-		if cr.Node() == testNode || cr.Node() == subtestNode {
+		if cr.Node() == testNode {
 			cr.Delete()
 		}
+
+		if cr.Node() == subtestNode && subtestNode != nil {
+			cr.Delete()
+		}
+
 		return true
 	}, nil)
 
