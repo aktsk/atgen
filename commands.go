@@ -1,6 +1,8 @@
 package main
 
 import (
+	"io"
+	"os"
 	"path/filepath"
 
 	atgen "github.com/mizzy/atgen/lib"
@@ -21,17 +23,12 @@ var commandGen = cli.Command{
 	Action: doGen,
 	Flags: []cli.Flag{
 		cli.StringFlag{
-			Name:  "yamlDir",
+			Name:  "templateDir",
 			Value: ".",
-			Usage: "directory that has test definition yaml files",
+			Usage: "template directory that has template yaml and code",
 		},
 		cli.StringFlag{
-			Name:  "templateFile",
-			Value: "template_test.go",
-			Usage: "template file defines test code",
-		},
-		cli.StringFlag{
-			Name:  "dir",
+			Name:  "outputDir",
 			Value: ".",
 			Usage: "output directory to write generated test files",
 		},
@@ -39,16 +36,36 @@ var commandGen = cli.Command{
 }
 
 func doGen(c *cli.Context) error {
-	files, err := filepath.Glob(filepath.Join(c.String("yamlDir"), "*.y*ml"))
+	templateDir := c.String("templateDir")
+	outputDir := c.String("outputDir")
+
+	testFiles, err := filepath.Glob(filepath.Join(templateDir, "*_test.go"))
 	if err != nil {
 		return err
 	}
 
-	for _, file := range files {
+	for _, testFile := range testFiles {
+		if testFile != "template_test.go" {
+			src := filepath.Join(templateDir, testFile)
+			dest := filepath.Join(outputDir, testFile)
+			err := copyFile(src, dest)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	yamlFiles, err := filepath.Glob(filepath.Join(templateDir, "*.y*ml"))
+	if err != nil {
+		return err
+	}
+
+	for _, yamlFile := range yamlFiles {
 		generator := atgen.Generator{
-			Yaml:     file,
-			Template: c.String("templateFile"),
-			Dir:      c.String("dir"),
+			Yaml:        yamlFile,
+			Template:    filepath.Join(templateDir, "template_test.go"),
+			TemplateDir: templateDir,
+			OutputDir:   outputDir,
 		}
 
 		err := generator.ParseYaml()
@@ -60,6 +77,27 @@ func doGen(c *cli.Context) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func copyFile(s, d string) error {
+	src, err := os.Open(s)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	dest, err := os.Create(d)
+	if err != nil {
+		return err
+	}
+	defer dest.Close()
+
+	_, err = io.Copy(dest, src)
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -23,7 +23,7 @@ func (g *Generator) Generate() error {
 
 	tfuncs := filterTestFuncs(g.TestFuncs)
 	for v, t := range tfuncs {
-		out := filepath.Join(g.Dir, fmt.Sprintf("%s_%s.go", v, base))
+		out := filepath.Join(g.OutputDir, fmt.Sprintf("%s_%s.go", v, base))
 		f, err := os.Create(out)
 		if err != nil {
 			return err

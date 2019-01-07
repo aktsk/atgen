@@ -3,7 +3,8 @@ package atgen
 type Generator struct {
 	Yaml                   string
 	Template               string
-	Dir                    string
+	TemplateDir            string
+	OutputDir              string
 	TestFuncs              TestFuncs
 	TestFuncsPerAPIVersion map[string]TestFuncs
 }
