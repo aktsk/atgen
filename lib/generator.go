@@ -16,6 +16,7 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
+// Generate generates code and write to files
 func (g *Generator) Generate() error {
 	base := getFileNameWithoutExt(g.Yaml)
 	if !strings.HasSuffix(base, "_test") {

@@ -1,5 +1,6 @@
 package atgen
 
+// Generator is the type for code generator
 type Generator struct {
 	Yaml                   string
 	Template               string
