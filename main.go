@@ -24,6 +24,6 @@ func newApp() *cli.App {
 	app.Version = Version
 	app.Author = "Gosuke Miyashita"
 	app.Email = "gosukenator@gmail.com"
-	app.Commands = Commands
+	app.Commands = commands
 	return app
 }

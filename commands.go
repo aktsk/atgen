@@ -10,7 +10,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-var Commands = []cli.Command{
+var commands = []cli.Command{
 	commandGen,
 	//commandDiff,
 }
