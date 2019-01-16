@@ -7,7 +7,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-var Version string = "0.1.0"
+var version = "0.1.0"
 
 func main() {
 	err := newApp().Run(os.Args)
@@ -21,7 +21,7 @@ func newApp() *cli.App {
 	app := cli.NewApp()
 	app.Name = "atgen"
 	app.Usage = "Generate API test code from Request/Response definition or show diff between Request/Response definition and API definition"
-	app.Version = Version
+	app.Version = version
 	app.Author = "Gosuke Miyashita"
 	app.Email = "gosukenator@gmail.com"
 	app.Commands = commands
