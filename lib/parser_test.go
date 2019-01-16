@@ -4,13 +4,23 @@ import (
 	"testing"
 )
 
+func convertToTestFuncsHelper(t *testing.T, parsed []map[interface{}]interface{}) TestFuncs {
+	t.Helper()
+
+	funcs, err := convertToTestFuncs(parsed)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return funcs
+}
+
 func TestParseTestFuncPerAPIVersion(t *testing.T) {
 	parsed, err := parseYaml([]byte(yamlTestFuncPerAPIVersion))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	testFuncs := convertToTestFuncs(parsed)
+	testFuncs := convertToTestFuncsHelper(t, parsed)
 	testFunc := testFuncs[0]
 
 	if testFunc.Name != "TestFoo" {
@@ -41,7 +51,7 @@ func TestParseTestPerAPIVersion(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	testFuncs := convertToTestFuncs(parsed)
+	testFuncs := convertToTestFuncsHelper(t, parsed)
 	testFunc := testFuncs[0]
 
 	if testFunc.Name != "TestFoo" {
@@ -65,7 +75,7 @@ func TestParseTestFuncAndTestPerAPIVersion(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	testFuncs := convertToTestFuncs(parsed)
+	testFuncs := convertToTestFuncsHelper(t, parsed)
 	testFunc := testFuncs[0]
 
 	if testFunc.Name != "TestFoo" {
@@ -88,7 +98,7 @@ func TestParseTestFuncWithSubtests(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	testFuncs := convertToTestFuncs(parsed)
+	testFuncs := convertToTestFuncsHelper(t, parsed)
 	testFunc := testFuncs[0]
 
 	if testFunc.Name != "TestWithSubtests" {
@@ -123,7 +133,7 @@ func TestGetVersionsOfTestFunc(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	testFuncs := convertToTestFuncs(parsed)
+	testFuncs := convertToTestFuncsHelper(t, parsed)
 	versions := getVersions(testFuncs[0])
 
 	if versions[0] != "v1beta1" {
@@ -144,7 +154,7 @@ func TestGetVersionsOfTest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	testFuncs := convertToTestFuncs(parsed)
+	testFuncs := convertToTestFuncsHelper(t, parsed)
 	versions := getVersions(testFuncs[0])
 
 	if len(versions) != 3 {
@@ -170,7 +180,7 @@ func TestGetVersionsOfTestFuncAndTest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	testFuncs := convertToTestFuncs(parsed)
+	testFuncs := convertToTestFuncsHelper(t, parsed)
 	versions := getVersions(testFuncs[0])
 
 	if len(versions) != 3 {
