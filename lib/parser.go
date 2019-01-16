@@ -19,8 +19,12 @@ func (g *Generator) ParseYaml() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	testFuncs, err := convertToTestFuncs(parsed)
+	if err != nil {
+		return errors.WithStack(err)
+	}
 
-	g.TestFuncs = convertToTestFuncs(parsed)
+	g.TestFuncs = testFuncs
 
 	return nil
 }
@@ -34,7 +38,7 @@ func parseYaml(buf []byte) ([]map[interface{}]interface{}, error) {
 	return parsed, nil
 }
 
-func convertToTestFuncs(parsed []map[interface{}]interface{}) TestFuncs {
+func convertToTestFuncs(parsed []map[interface{}]interface{}) (TestFuncs, error) {
 	var testFuncs TestFuncs
 	for _, p := range parsed {
 		if p["name"] == nil {
@@ -42,7 +46,11 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) TestFuncs {
 		}
 
 		testFunc := TestFunc{}
-		testFunc.Name = p["name"].(string)
+		name, ok := p["name"].(string)
+		if !ok {
+			return testFuncs, errors.New("name must be string")
+		}
+		testFunc.Name = name
 
 		if p["apiVersions"] != nil {
 			for _, v := range p["apiVersions"].([]interface{}) {
@@ -62,7 +70,7 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) TestFuncs {
 		}
 		testFuncs = append(testFuncs, testFunc)
 	}
-	return testFuncs
+	return testFuncs, nil
 }
 
 func convertToTest(t map[interface{}]interface{}) Test {

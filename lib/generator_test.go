@@ -4,12 +4,24 @@ import (
 	"testing"
 )
 
-func TestFilterTestFunc(t *testing.T) {
-	parsed, err := parseYaml([]byte(yamlTestFuncPerAPIVersion))
+func parseAndConvertToTestFuncs(t *testing.T, yaml string) map[string]TestFuncs {
+	t.Helper()
+
+	parsed, err := parseYaml([]byte(yaml))
 	if err != nil {
 		t.Fatal(err)
 	}
-	tfuncs := filterTestFuncs(convertToTestFuncs(parsed))
+
+	testFuncs, err := convertToTestFuncs(parsed)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return filterTestFuncs(testFuncs)
+}
+
+func TestFilterTestFunc(t *testing.T) {
+	tfuncs := parseAndConvertToTestFuncs(t, yamlTestFuncPerAPIVersion)
 
 	if tfuncs["v1beta1"][0].Vars["key"] != "val" {
 		t.Fatalf(`tfuncs["v1beta1"][0].Vars["key"] should be val`)
@@ -27,11 +39,7 @@ func TestFilterTestFunc(t *testing.T) {
 }
 
 func TestFilterTest(t *testing.T) {
-	parsed, err := parseYaml([]byte(yamlTestPerAPIVersion))
-	if err != nil {
-		t.Fatal(err)
-	}
-	tfuncs := filterTestFuncs(convertToTestFuncs(parsed))
+	tfuncs := parseAndConvertToTestFuncs(t, yamlTestPerAPIVersion)
 
 	v1beta1 := tfuncs["v1beta1"][0].Tests[0].(Test)
 	if v1beta1.Path != "/v1beta1/user" {
@@ -45,11 +53,7 @@ func TestFilterTest(t *testing.T) {
 }
 
 func TestFilterTestFuncAndTest(t *testing.T) {
-	parsed, err := parseYaml([]byte(yamlTestFuncAndTestPerAPIVersion))
-	if err != nil {
-		t.Fatal(err)
-	}
-	tfuncs := filterTestFuncs(convertToTestFuncs(parsed))
+	tfuncs := parseAndConvertToTestFuncs(t, yamlTestFuncAndTestPerAPIVersion)
 
 	v1beta1 := tfuncs["v1beta1"][0].Tests[0].(Test)
 	if v1beta1.Path != "/v1beta1/user" {
@@ -73,11 +77,7 @@ func TestFilterTestFuncAndTest(t *testing.T) {
 }
 
 func TestFilterTestFuncAndSubtests(t *testing.T) {
-	parsed, err := parseYaml([]byte(yamlTestFuncWithSubtests))
-	if err != nil {
-		t.Fatal(err)
-	}
-	tfuncs := filterTestFuncs(convertToTestFuncs(parsed))
+	tfuncs := parseAndConvertToTestFuncs(t, yamlTestFuncWithSubtests)
 
 	subtest := tfuncs["v1"][0].Tests[2].(Subtests)[0]
 	if subtest.Name != "SubFoo" {
