@@ -7,7 +7,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// ParseYaml parsed yaml which deifnes test requests/responses
+// ParseYaml parses yaml which deifnes test requests/responses
 // and convert it to types defined in types.go
 func (g *Generator) ParseYaml() error {
 	buf, err := ioutil.ReadFile(g.Yaml)
