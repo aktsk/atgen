@@ -9,13 +9,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// The person Type (more like an object)
+// Person is the person type (more like an object)
 type Person struct {
 	ID        string   `json:"id,omitempty"`
 	Firstname string   `json:"firstname,omitempty"`
 	Lastname  string   `json:"lastname,omitempty"`
 	Address   *Address `json:"address,omitempty"`
 }
+
+// Address is the address type
 type Address struct {
 	City  string `json:"city,omitempty"`
 	State string `json:"state,omitempty"`
@@ -23,12 +25,12 @@ type Address struct {
 
 var people []Person
 
-// Display all from the people var
+// GetPeople displays all from the people var
 func GetPeople(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(people)
 }
 
-// Display a single data
+// GetPerson displays a single data
 func GetPerson(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	for _, item := range people {
@@ -40,7 +42,7 @@ func GetPerson(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 }
 
-// create a new item
+// CreatePerson creates a new item
 func CreatePerson(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var person Person
@@ -50,7 +52,7 @@ func CreatePerson(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(person)
 }
 
-// Delete an item
+// DeletePerson deletes an item
 func DeletePerson(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	for index, item := range people {
