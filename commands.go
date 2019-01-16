@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mizzy/atgen/lib"
+	atgen "github.com/mizzy/atgen/lib"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )

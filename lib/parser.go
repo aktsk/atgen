@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // ParseYaml parsed yaml which deifnes test requests/responses
