@@ -24,12 +24,12 @@ var commandGen = cli.Command{
 	Action: doGen,
 	Flags: []cli.Flag{
 		cli.StringFlag{
-			Name:  "templateDir",
+			Name:  "templateDir, t",
 			Value: ".",
 			Usage: "template directory that has template yaml and code",
 		},
 		cli.StringFlag{
-			Name:  "outputDir",
+			Name:  "outputDir, o",
 			Value: ".",
 			Usage: "output directory to write generated test files",
 		},
