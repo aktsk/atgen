@@ -31,7 +31,10 @@ func (g *Generator) Generate() error {
 			return errors.WithStack(err)
 		}
 		defer f.Close()
-		g.generateTestFuncs(v, t, f)
+		err = g.generateTestFuncs(v, t, f)
+		if err != nil {
+			return errors.WithStack(err)
+		}
 	}
 	return nil
 }
