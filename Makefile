@@ -1,5 +1,5 @@
-NAME := atge
-VERSION = $(shell gobump show -r ./version)
+NAME := atgen
+VERSION = $(shell gobump show -r)
 REVISION := $(shell git rev-parse --short HEAD)
 
 all: build
@@ -22,4 +22,21 @@ fmt: setup
 	goimports -w .
 
 build:
-	go build
+	go build -o ./bin/$(NAME)
+
+clean:
+	rm bin/$(NAME)
+
+package: setup
+	@sh -c "'$(CURDIR)/scripts/package.sh'"
+
+crossbuild: setup
+	goxz -pv=v${VERSION} -build-ldflags="-X main.GitCommit=${REVISION}" \
+        -arch=386,amd64 -d=./pkg/dist/v${VERSION} \
+        -n ${NAME}
+
+release: package
+	ghr -u aktsk v${VERSION} ./pkg/dist/v${VERSION}
+
+bump:
+	@sh -c "'$(CURDIR)/scripts/bump.sh'"
