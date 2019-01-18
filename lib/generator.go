@@ -16,7 +16,7 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-const GetRouter = "getRouter"
+const RouterFuncName = "routerFunc"
 
 // Generate generates code and write to files
 func (g *Generator) Generate() error {
@@ -287,7 +287,7 @@ func rewriteTestNode(n ast.Node, test Test, tfunc TestFunc) ast.Node {
 		switch v := cr.Node().(type) {
 		case *ast.CallExpr:
 			ident, ok := v.Fun.(*ast.Ident)
-			if ok && ident.Name == GetRouter {
+			if ok && ident.Name == RouterFuncName {
 				ident.Name = tfunc.RouterFunc
 			}
 		case *ast.BasicLit:
