@@ -16,7 +16,7 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-const RouterFuncName = "routerFunc"
+const RouterFuncName = "RouterFunc"
 
 // Generate generates code and write to files
 func (g *Generator) Generate() error {
@@ -87,14 +87,14 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 	var tfnodes []ast.Node
 	for _, testFunc := range testFuncs {
 		tfnode := util.DuplicateNode(testFuncNode)
-		tfnode.(*ast.FuncDecl).Name.Name = testFunc.Name
+		rewriteTestFuncNode(tfnode, testFunc)
 
 		var tnodes []ast.Node
 		for _, t := range testFunc.Tests {
 			switch test := t.(type) {
 			case Test:
 				tnode := util.DuplicateNode(testNode)
-				tnode = rewriteTestNode(tnode, test, testFunc)
+				tnode = rewriteTestNode(tnode, test)
 				tnodes = append(tnodes, tnode)
 			case Subtests:
 				for _, subtest := range test {
@@ -113,7 +113,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 					var tests []ast.Node
 					for _, test := range subtest.Tests {
 						tnode := util.DuplicateNode(testNode)
-						tnode = rewriteTestNode(tnode, test, testFunc)
+						tnode = rewriteTestNode(tnode, test)
 						tests = append(tests, tnode)
 					}
 					subtnode = rewriteSubtestNode(subtnode, tests)
@@ -201,8 +201,9 @@ func filterTestFuncs(testFuncs TestFuncs) map[string]TestFuncs {
 
 func filterTests(testFunc TestFunc, version string) TestFunc {
 	tfunc := TestFunc{
-		Name: testFunc.Name,
-		Vars: testFunc.Vars,
+		Name:       testFunc.Name,
+		Vars:       testFunc.Vars,
+		RouterFunc: testFunc.RouterFunc,
 	}
 	for _, t := range testFunc.Tests {
 		switch v := t.(type) {
@@ -281,8 +282,9 @@ func getVersions(testFunc TestFunc) []string {
 	return deduped
 }
 
-func rewriteTestNode(n ast.Node, test Test, tfunc TestFunc) ast.Node {
-	var ident string
+func rewriteTestFuncNode(n ast.Node, tfunc TestFunc) ast.Node {
+	n.(*ast.FuncDecl).Name.Name = tfunc.Name
+
 	astutil.Apply(n, func(cr *astutil.Cursor) bool {
 		switch v := cr.Node().(type) {
 		case *ast.CallExpr:
@@ -290,6 +292,17 @@ func rewriteTestNode(n ast.Node, test Test, tfunc TestFunc) ast.Node {
 			if ok && ident.Name == RouterFuncName {
 				ident.Name = tfunc.RouterFunc
 			}
+		}
+		return true
+	}, nil)
+
+	return n
+}
+
+func rewriteTestNode(n ast.Node, test Test) ast.Node {
+	var ident string
+	astutil.Apply(n, func(cr *astutil.Cursor) bool {
+		switch v := cr.Node().(type) {
 		case *ast.BasicLit:
 			switch v.Value {
 			case `"Method"`:

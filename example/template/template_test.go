@@ -11,7 +11,7 @@ import (
 // TestFunc block
 // You must write above comment to point this is a test function.
 func TestTeamplate(t *testing.T) {
-	r := routerFunc()
+	r := RouterFunc()
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
