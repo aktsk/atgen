@@ -2,6 +2,7 @@ package atgen
 
 var yamlTestFuncPerAPIVersion = `
 - name: TestFoo
+  routerFunc: getRouter
   apiVersions:
     - v1beta1
     - v1beta2
@@ -30,6 +31,7 @@ var yamlTestFuncPerAPIVersion = `
 
 var yamlTestPerAPIVersion = `
 - name: TestFoo
+  routerFunc: getRouter
   tests:
     - apiVersions:
         - v1beta1
@@ -65,6 +67,7 @@ var yamlTestPerAPIVersion = `
 
 var yamlTestFuncAndTestPerAPIVersion = `
 - name: TestFoo
+  routerFunc: getRouter
   apiVersions:
     - v1beta1
     - v1beta2
@@ -103,6 +106,7 @@ var yamlTestFuncAndTestPerAPIVersion = `
 
 var yamlTestFuncWithSubtests = `
 - name: TestWithSubtests
+  routerFunc: getRouter
   apiVersions:
     - v1
   tests:
