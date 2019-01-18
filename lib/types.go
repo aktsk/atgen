@@ -18,6 +18,7 @@ type TestFunc struct {
 	Name        string
 	Tests       []Tester
 	APIVersions []string
+	RouterFunc  string
 	Vars        map[string]interface{}
 }
 

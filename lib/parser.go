@@ -52,6 +52,12 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) (TestFuncs, error)
 		}
 		testFunc.Name = name
 
+		routerFunc, ok := p["routerFunc"].(string)
+		if !ok {
+			return testFuncs, errors.New("routerFunc must be string")
+		}
+		testFunc.RouterFunc = routerFunc
+
 		if p["apiVersions"] != nil {
 			for _, v := range p["apiVersions"].([]interface{}) {
 				testFunc.APIVersions = append(testFunc.APIVersions, v.(string))
