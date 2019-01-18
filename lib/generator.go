@@ -16,6 +16,8 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
+const GetRouter = "getRouter"
+
 // Generate generates code and write to files
 func (g *Generator) Generate() error {
 	base := getFileNameWithoutExt(g.Yaml)
@@ -70,6 +72,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 	}
 
 	astutil.Apply(testFuncNode, func(cr *astutil.Cursor) bool {
+
 		if cr.Node() == testNode {
 			cr.Delete()
 		}
@@ -91,7 +94,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 			switch test := t.(type) {
 			case Test:
 				tnode := util.DuplicateNode(testNode)
-				tnode = rewriteTestNode(tnode, test)
+				tnode = rewriteTestNode(tnode, test, testFunc)
 				tnodes = append(tnodes, tnode)
 			case Subtests:
 				for _, subtest := range test {
@@ -110,7 +113,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 					var tests []ast.Node
 					for _, test := range subtest.Tests {
 						tnode := util.DuplicateNode(testNode)
-						tnode = rewriteTestNode(tnode, test)
+						tnode = rewriteTestNode(tnode, test, testFunc)
 						tests = append(tests, tnode)
 					}
 					subtnode = rewriteSubtestNode(subtnode, tests)
@@ -278,10 +281,15 @@ func getVersions(testFunc TestFunc) []string {
 	return deduped
 }
 
-func rewriteTestNode(n ast.Node, test Test) ast.Node {
+func rewriteTestNode(n ast.Node, test Test, tfunc TestFunc) ast.Node {
 	var ident string
 	astutil.Apply(n, func(cr *astutil.Cursor) bool {
 		switch v := cr.Node().(type) {
+		case *ast.CallExpr:
+			ident, ok := v.Fun.(*ast.Ident)
+			if ok && ident.Name == GetRouter {
+				ident.Name = tfunc.RouterFunc
+			}
 		case *ast.BasicLit:
 			switch v.Value {
 			case `"Method"`:
