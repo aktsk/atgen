@@ -16,6 +16,7 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
+// RouterFuncName is function name to be replaced
 const RouterFuncName = "RouterFunc"
 
 // Generate generates code and write to files
