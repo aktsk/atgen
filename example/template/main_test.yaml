@@ -1,4 +1,5 @@
 - name: TestGetPerson
+  reouterFunc: getRouter
   apiVersions:
     - v1
   tests:
@@ -12,6 +13,7 @@
           lastname: Doe
 
 - name: TestPostAndDeletePerson
+  reouterFunc: getRouter
   apiVersions:
     - v1
   tests:
