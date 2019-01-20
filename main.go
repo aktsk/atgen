@@ -22,8 +22,7 @@ func newApp() *cli.App {
 	app.Name = "atgen"
 	app.Usage = "Generate API test code from Request/Response definition or show diff between Request/Response definition and API definition"
 	app.Version = version
-	app.Author = "Gosuke Miyashita"
-	app.Email = "gosukenator@gmail.com"
+	app.Author = "Akatsuki Inc."
 	app.Commands = commands
 	return app
 }
