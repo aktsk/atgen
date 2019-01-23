@@ -1,7 +1,16 @@
 package atgen
 
 import (
+	"fmt"
+	"go/types"
 	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/spf13/afero"
+
+	"golang.org/x/tools/go/loader"
 
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
@@ -24,9 +33,32 @@ func (g *Generator) ParseYaml() error {
 		return errors.WithStack(err)
 	}
 
+	err, routerFuncs, testFuncs := aggregateRouterFunc(testFuncs, g.TemplateDir)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	program, err := loadUsingPackages(routerFuncs)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	refineRouterFunc(routerFuncs, program)
+
+	err = validateRouterFuncs(routerFuncs, program)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	g.RouterFuncs = routerFuncs
 	g.TestFuncs = testFuncs
 
 	return nil
+}
+
+func refineRouterFunc(routerFuncs []*RouterFunc, program *loader.Program) {
+	for _, routerFunc := range routerFuncs {
+		routerFunc.Package = program.Package(routerFunc.PackagePath).Pkg
+	}
 }
 
 func parseYaml(buf []byte) ([]map[interface{}]interface{}, error) {
@@ -56,7 +88,7 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) (TestFuncs, error)
 		if !ok {
 			return testFuncs, errors.New("routerFunc must be string")
 		}
-		testFunc.RouterFunc = routerFunc
+		testFunc.RouterFuncName = routerFunc
 
 		if p["apiVersions"] != nil {
 			for _, v := range p["apiVersions"].([]interface{}) {
@@ -89,6 +121,128 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) (TestFuncs, error)
 		testFuncs = append(testFuncs, testFunc)
 	}
 	return testFuncs, nil
+}
+
+func loadUsingPackages(routerFuncs []*RouterFunc) (*loader.Program, error) {
+	packagePaths := []string{"net/http"}
+
+	for _, routerFunc := range routerFuncs {
+		if !usingSamePackage(packagePaths, routerFunc) {
+			packagePaths = append(packagePaths, routerFunc.PackagePath)
+		}
+	}
+
+	conf := loader.Config{}
+	for _, packagePath := range packagePaths {
+		conf.Import(packagePath)
+	}
+	return conf.Load()
+}
+
+func usingSamePackage(packagePaths []string, routerFunc *RouterFunc) bool {
+	for _, packagePath := range packagePaths {
+		if packagePath == routerFunc.PackagePath {
+			return true
+		}
+	}
+	return false
+}
+
+func aggregateRouterFunc(tfuncs TestFuncs, templateDir string) (error, []*RouterFunc, TestFuncs) {
+	absPath, err := filepath.Abs(templateDir)
+	if err != nil {
+		return err, nil, nil
+	}
+
+	packageName, err := PackageName(afero.NewOsFs(), os.Getenv("GOPATH"), absPath)
+	if err != nil {
+		return err, nil, nil
+	}
+	newTfuncs := make(TestFuncs, len(tfuncs))
+	routerFuncs := []*RouterFunc{}
+	for i, tfunc := range tfuncs {
+		routerFuncNameList := strings.Split(tfunc.RouterFuncName, ".")
+		if len(routerFuncNameList) == 0 {
+			return errors.New("invalid format routerFunc"), nil, nil
+		}
+		var packagePath, funcName string
+		if len(routerFuncNameList) == 1 {
+			packagePath = "./"
+			funcName = routerFuncNameList[0]
+		} else {
+			packagePath = strings.Join(routerFuncNameList[0:len(routerFuncNameList)-1], ".")
+			funcName = routerFuncNameList[len(routerFuncNameList)-1]
+		}
+
+		if isRelativePath(packagePath) {
+			packagePath = filepath.Join(packageName, packagePath)
+		}
+
+		routerFunc := RouterFunc{
+			PackagePath: packagePath,
+			Name:        funcName,
+		}
+		tfunc.RouterFunc = &routerFunc
+		newTfuncs[i] = tfunc
+		routerFuncs = append(routerFuncs, &routerFunc)
+	}
+
+	return nil, routerFuncs, newTfuncs
+}
+
+func isRelativePath(path string) bool {
+	return strings.HasPrefix(path, ".")
+}
+
+func validateRouterFuncs(routerFuncs []*RouterFunc, program *loader.Program) error {
+	handlerObj := program.Package("net/http").Pkg.Scope().Lookup("Handler")
+	for _, routerFunc := range routerFuncs {
+		pkg := program.Package(routerFunc.PackagePath)
+		if pkg == nil {
+			return errors.New(fmt.Sprintf("%s is not found in loaded packages", routerFunc.PackagePath))
+		}
+		funcObj := pkg.Pkg.Scope().Lookup(routerFunc.Name)
+
+		err := validateRouterFuncObj(handlerObj, funcObj, routerFunc)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func validateRouterFuncObj(handlerObj types.Object, routerFuncObj types.Object, routerFunc *RouterFunc) error {
+	if routerFuncObj == nil {
+		return errors.Errorf("can't resolve %s.%s", routerFunc.PackagePath, routerFunc.Name)
+	}
+
+	fun, ok := routerFuncObj.(*types.Func)
+	if !ok {
+		return errors.Errorf("%s.%s is not function", routerFunc.PackagePath, routerFunc.Name)
+	}
+
+	signature, ok := fun.Type().(*types.Signature)
+	if !ok {
+		return errors.Errorf("%s.%s is not signature", routerFunc.PackagePath, routerFunc.Name)
+	}
+
+	if signature.Recv() != nil {
+		return errors.Errorf("%s.%s signature should be func() http.Handler (the function is method)", routerFunc.PackagePath, routerFunc.Name)
+	}
+
+	if signature.Params().Len() != 0 {
+		return errors.Errorf("%s.%s signature should be func() http.Handler (the function receive params)", routerFunc.PackagePath, routerFunc.Name)
+	}
+
+	if signature.Results().Len() != 1 {
+		return errors.Errorf("%s.%s signature should be func() http.Handler (the function return more than 1 results)", routerFunc.PackagePath, routerFunc.Name)
+	}
+
+	if !types.AssignableTo(signature.Results().At(0).Type(), handlerObj.Type()) {
+		return errors.Errorf("%s.%s signature should be func() http.Handler (the function don't return http.Handler)", routerFunc.PackagePath, routerFunc.Name)
+	}
+
+	return nil
 }
 
 func convertToTest(t map[interface{}]interface{}) (Test, error) {

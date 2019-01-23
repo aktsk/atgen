@@ -1,5 +1,5 @@
 - name: TestGetPerson
-  routerFunc: getRouter
+  routerFunc: github.com/aktsk/atgen/example.getRouter
   apiVersions:
     - v1
   tests:
@@ -13,7 +13,7 @@
           lastname: Doe
 
 - name: TestPostAndDeletePerson
-  routerFunc: getRouter
+  routerFunc: github.com/aktsk/atgen/example.getRouter
   apiVersions:
     - v1
   tests:
@@ -39,3 +39,13 @@
       method: get
       res:
         status: 404
+
+- name: TestDummyRouter
+  routerFunc: ../handlers.DummyRouter
+  apiVersions:
+    - v1
+  tests:
+    - path: /{apiVersion/}
+      method: get
+      res:
+        status: 200

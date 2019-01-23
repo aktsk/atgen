@@ -7,9 +7,14 @@ import (
 	"go/printer"
 	"go/token"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/spf13/afero"
+
+	"golang.org/x/tools/go/loader"
 
 	util "github.com/lkesteloot/astutil"
 	"github.com/pkg/errors"
@@ -28,16 +33,28 @@ func (g *Generator) Generate() error {
 
 	tfuncs := filterTestFuncs(g.TestFuncs)
 	for v, t := range tfuncs {
-		out := filepath.Join(g.OutputDir, fmt.Sprintf("%s_%s.go", v, base))
+		filename := fmt.Sprintf("%s_%s.go", v, base)
+		tf, err := ioutil.TempFile(g.OutputDir, filename)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		defer func() {
+			tf.Close()
+			os.Remove(tf.Name())
+		}()
+		err = g.generateTestFuncs(v, t, tf)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		out := filepath.Join(g.OutputDir, filename)
 		f, err := os.Create(out)
 		if err != nil {
 			return errors.WithStack(err)
 		}
 		defer f.Close()
-		err = g.generateTestFuncs(v, t, f)
-		if err != nil {
-			return errors.WithStack(err)
-		}
+
+		tf.Seek(0, 0)
+		io.Copy(f, tf)
 	}
 	return nil
 }
@@ -85,10 +102,22 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 		return true
 	}, nil)
 
+	absPath, err := filepath.Abs(g.OutputDir)
+	if err != nil {
+		return err
+	}
+
+	outputPath, err := PackageName(afero.NewOsFs(), os.Getenv("GOPATH"), absPath)
+	if err != nil {
+		return err
+	}
+
+	rewriteFileAst(fset, f, testFuncs, outputPath)
+
 	var tfnodes []ast.Node
 	for _, testFunc := range testFuncs {
 		tfnode := util.DuplicateNode(testFuncNode)
-		rewriteTestFuncNode(tfnode, testFunc)
+		rewriteTestFuncNode(tfnode, testFunc, outputPath)
 
 		var tnodes []ast.Node
 		for _, t := range testFunc.Tests {
@@ -202,9 +231,10 @@ func filterTestFuncs(testFuncs TestFuncs) map[string]TestFuncs {
 
 func filterTests(testFunc TestFunc, version string) TestFunc {
 	tfunc := TestFunc{
-		Name:       testFunc.Name,
-		Vars:       testFunc.Vars,
-		RouterFunc: testFunc.RouterFunc,
+		Name:           testFunc.Name,
+		Vars:           testFunc.Vars,
+		RouterFuncName: testFunc.RouterFuncName,
+		RouterFunc:     testFunc.RouterFunc,
 	}
 	for _, t := range testFunc.Tests {
 		switch v := t.(type) {
@@ -283,21 +313,47 @@ func getVersions(testFunc TestFunc) []string {
 	return deduped
 }
 
-func rewriteTestFuncNode(n ast.Node, tfunc TestFunc) ast.Node {
-	n.(*ast.FuncDecl).Name.Name = tfunc.Name
+func convertToOutputDirPath(outputDir string) (string, error) {
+	conf := loader.Config{}
+	conf.Import(".")
+	program, err := conf.Load()
+	if err != nil {
+		return "", err
+	}
 
+	currentPackagePath := program.Package(".").Pkg.Path()
+	return filepath.Join(currentPackagePath, outputDir), nil
+}
+
+func rewriteFileAst(fset *token.FileSet, f *ast.File, tfuncs TestFuncs, outputPath string) {
+	for _, tfunc := range tfuncs {
+		if tfunc.RouterFunc.Package.Path() == outputPath {
+			continue
+		}
+		// TODO: When package names conflict, this field should be set with a generated unique name
+		astutil.AddImport(fset, f, tfunc.RouterFunc.Package.Path())
+	}
+}
+
+func rewriteTestFuncNode(n ast.Node, tfunc TestFunc, outputPath string) {
+	n.(*ast.FuncDecl).Name.Name = tfunc.Name
 	astutil.Apply(n, func(cr *astutil.Cursor) bool {
 		switch v := cr.Node().(type) {
 		case *ast.CallExpr:
 			ident, ok := v.Fun.(*ast.Ident)
 			if ok && ident.Name == RouterFuncName {
-				ident.Name = tfunc.RouterFunc
+				if tfunc.RouterFunc.PackagePath == outputPath {
+					v.Fun = &ast.Ident{Name: tfunc.RouterFunc.Name}
+				} else {
+					v.Fun = &ast.SelectorExpr{
+						X:   &ast.Ident{Name: tfunc.RouterFunc.Package.Name()},
+						Sel: &ast.Ident{Name: tfunc.RouterFunc.Name},
+					}
+				}
 			}
 		}
 		return true
 	}, nil)
-
-	return n
 }
 
 func rewriteTestNode(n ast.Node, test Test) ast.Node {

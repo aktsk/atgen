@@ -23,7 +23,11 @@ func PackageName(fs afero.Fs, gopath string, path string) (string, error) {
 	}
 	defer file.Close()
 
-	gomodPath, err := searchGoModfile(fs, file)
+	absPath, err := filepath.Abs(file.Name())
+	if err != nil {
+		return "", errors.WithStack(err)
+	}
+	gomodPath, err := searchGoModfile(fs, absPath)
 	if err != nil {
 		return "", errors.WithStack(err)
 	}
@@ -48,14 +52,19 @@ func PackageName(fs afero.Fs, gopath string, path string) (string, error) {
 	return filepath.Join(packageName, rel), nil
 }
 
-func searchGoModfile(fs afero.Fs, file afero.File) (string, error) {
-	fileInfo, err := fs.Stat(file.Name())
+func searchGoModfile(fs afero.Fs, absPath string) (string, error) {
+	file, err := fs.Open(absPath)
+	if err != nil {
+		return "", errors.WithStack(err)
+	}
+
+	fileInfo, err := file.Stat()
 	if err != nil {
 		return "", errors.WithStack(err)
 	}
 
 	if !fileInfo.IsDir() {
-		return "", errors.Errorf("specified file is not dir (filename=%s)", file.Name())
+		return "", errors.Errorf("specified file is not dir (absPath=%s)", absPath)
 	}
 
 	names, err := file.Readdirnames(-1)
@@ -69,14 +78,8 @@ func searchGoModfile(fs afero.Fs, file afero.File) (string, error) {
 		}
 	}
 
-	parentPath := filepath.Dir(file.Name())
-	parentFile, err := fs.Open(parentPath)
-	if err != nil {
-		return "", errors.WithStack(err)
-	}
-	defer parentFile.Close()
-
-	return searchGoModfile(fs, parentFile)
+	parentPath := filepath.Dir(absPath)
+	return searchGoModfile(fs, parentPath)
 }
 
 // TODO: Use modfile package after cmd/go/internal/modfile was made public. https://github.com/golang/go/issues/23966

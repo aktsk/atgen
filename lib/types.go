@@ -1,11 +1,14 @@
 package atgen
 
+import "go/types"
+
 // Generator is the type for code generator
 type Generator struct {
 	Yaml                   string
 	Template               string
 	TemplateDir            string
 	OutputDir              string
+	RouterFuncs            []*RouterFunc
 	TestFuncs              TestFuncs
 	TestFuncsPerAPIVersion map[string]TestFuncs
 }
@@ -15,11 +18,12 @@ type TestFuncs []TestFunc
 
 // TestFunc represents a test function
 type TestFunc struct {
-	Name        string
-	Tests       []Tester
-	APIVersions []string
-	RouterFunc  string
-	Vars        map[string]interface{}
+	Name           string
+	Tests          []Tester
+	APIVersions    []string
+	RouterFuncName string
+	RouterFunc     *RouterFunc
+	Vars           map[string]interface{}
 }
 
 // Test represents a test in a test function
@@ -68,4 +72,10 @@ func (t Test) IsSubtests() bool {
 // IsSubtests returns true when t is Subtests
 func (t Subtests) IsSubtests() bool {
 	return true
+}
+
+type RouterFunc struct {
+	Package     *types.Package
+	PackagePath string
+	Name        string
 }
