@@ -12,13 +12,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/spf13/afero"
-
-	"golang.org/x/tools/go/loader"
-
 	util "github.com/lkesteloot/astutil"
 	"github.com/pkg/errors"
+	"github.com/spf13/afero"
 	"golang.org/x/tools/go/ast/astutil"
+	"golang.org/x/tools/go/loader"
 )
 
 // RouterFuncName is function name to be replaced
@@ -90,7 +88,6 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 	}
 
 	astutil.Apply(testFuncNode, func(cr *astutil.Cursor) bool {
-
 		if cr.Node() == testNode {
 			cr.Delete()
 		}
@@ -327,11 +324,11 @@ func convertToOutputDirPath(outputDir string) (string, error) {
 
 func rewriteFileAst(fset *token.FileSet, f *ast.File, tfuncs TestFuncs, outputPath string) {
 	for _, tfunc := range tfuncs {
-		if tfunc.RouterFunc.Package.Path() == outputPath {
+		if tfunc.RouterFunc.PackagePath == outputPath {
 			continue
 		}
 		// TODO: When package names conflict, this field should be set with a generated unique name
-		astutil.AddImport(fset, f, tfunc.RouterFunc.Package.Path())
+		astutil.AddImport(fset, f, tfunc.RouterFunc.PackagePath)
 	}
 }
 
@@ -346,7 +343,7 @@ func rewriteTestFuncNode(n ast.Node, tfunc TestFunc, outputPath string) {
 					v.Fun = &ast.Ident{Name: tfunc.RouterFunc.Name}
 				} else {
 					v.Fun = &ast.SelectorExpr{
-						X:   &ast.Ident{Name: tfunc.RouterFunc.Package.Name()},
+						X:   &ast.Ident{Name: tfunc.RouterFunc.PackagePath},
 						Sel: &ast.Ident{Name: tfunc.RouterFunc.Name},
 					}
 				}

@@ -8,11 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/spf13/afero"
-
-	"golang.org/x/tools/go/loader"
-
 	"github.com/pkg/errors"
+	"github.com/spf13/afero"
+	"golang.org/x/tools/go/loader"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -52,8 +50,6 @@ func (g *Generator) ParseYaml() error {
 		return errors.WithStack(err)
 	}
 
-	refineRouterFunc(routerFuncs, program)
-
 	err = validateRouterFuncs(routerFuncs, program)
 	if err != nil {
 		return errors.WithStack(err)
@@ -63,12 +59,6 @@ func (g *Generator) ParseYaml() error {
 	g.TestFuncs = testFuncs
 
 	return nil
-}
-
-func refineRouterFunc(routerFuncs []*RouterFunc, program *loader.Program) {
-	for _, routerFunc := range routerFuncs {
-		routerFunc.Package = program.Package(routerFunc.PackagePath).Pkg
-	}
 }
 
 func parseYaml(buf []byte) ([]map[interface{}]interface{}, error) {

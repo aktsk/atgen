@@ -1,7 +1,5 @@
 package atgen
 
-import "go/types"
-
 // Generator is the type for code generator
 type Generator struct {
 	Yaml                   string
@@ -76,7 +74,6 @@ func (t Subtests) IsSubtests() bool {
 
 // RouterFunc describe a function which should be called from test to get http.Handler
 type RouterFunc struct {
-	Package     *types.Package
 	PackagePath string
 	Name        string
 }
