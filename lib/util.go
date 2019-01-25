@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/afero"
 )
 
+// PackageName return package name of the path by considering GOPATH or go.mod
 func PackageName(fs afero.Fs, gopath string, path string) (string, error) {
 	for _, gpath := range filepath.SplitList(gopath) {
 		if strings.HasPrefix(path, gpath) {

@@ -74,6 +74,7 @@ func (t Subtests) IsSubtests() bool {
 	return true
 }
 
+// RouterFunc describe a function which should be called from test to get http.Handler
 type RouterFunc struct {
 	Package     *types.Package
 	PackagePath string
