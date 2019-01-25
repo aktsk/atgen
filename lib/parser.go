@@ -33,7 +33,17 @@ func (g *Generator) ParseYaml() error {
 		return errors.WithStack(err)
 	}
 
-	err, routerFuncs, testFuncs := aggregateRouterFunc(testFuncs, g.TemplateDir)
+	absPath, err := filepath.Abs(g.TemplateDir)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	packageName, err := PackageName(afero.NewOsFs(), os.Getenv("GOPATH"), absPath)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	routerFuncs, testFuncs, err := aggregateRouterFunc(testFuncs, packageName)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -148,22 +158,13 @@ func usingSamePackage(packagePaths []string, routerFunc *RouterFunc) bool {
 	return false
 }
 
-func aggregateRouterFunc(tfuncs TestFuncs, templateDir string) (error, []*RouterFunc, TestFuncs) {
-	absPath, err := filepath.Abs(templateDir)
-	if err != nil {
-		return err, nil, nil
-	}
-
-	packageName, err := PackageName(afero.NewOsFs(), os.Getenv("GOPATH"), absPath)
-	if err != nil {
-		return err, nil, nil
-	}
+func aggregateRouterFunc(tfuncs TestFuncs, templatePath string) ([]*RouterFunc, TestFuncs, error) {
 	newTfuncs := make(TestFuncs, len(tfuncs))
 	routerFuncs := []*RouterFunc{}
 	for i, tfunc := range tfuncs {
 		routerFuncNameList := strings.Split(tfunc.RouterFuncName, ".")
 		if len(routerFuncNameList) == 0 {
-			return errors.New("invalid format routerFunc"), nil, nil
+			return nil, nil, errors.New("invalid format routerFunc")
 		}
 		var packagePath, funcName string
 		if len(routerFuncNameList) == 1 {
@@ -175,7 +176,7 @@ func aggregateRouterFunc(tfuncs TestFuncs, templateDir string) (error, []*Router
 		}
 
 		if isRelativePath(packagePath) {
-			packagePath = filepath.Join(packageName, packagePath)
+			packagePath = filepath.Join(templatePath, packagePath)
 		}
 
 		routerFunc := RouterFunc{
@@ -187,7 +188,7 @@ func aggregateRouterFunc(tfuncs TestFuncs, templateDir string) (error, []*Router
 		routerFuncs = append(routerFuncs, &routerFunc)
 	}
 
-	return nil, routerFuncs, newTfuncs
+	return routerFuncs, newTfuncs, nil
 }
 
 func isRelativePath(path string) bool {
