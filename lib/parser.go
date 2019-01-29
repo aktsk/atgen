@@ -55,6 +55,7 @@ func (g *Generator) ParseYaml() error {
 		return errors.WithStack(err)
 	}
 
+	g.Program = program
 	g.RouterFuncs = routerFuncs
 	g.TestFuncs = testFuncs
 

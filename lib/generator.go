@@ -114,7 +114,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 	var tfnodes []ast.Node
 	for _, testFunc := range testFuncs {
 		tfnode := util.DuplicateNode(testFuncNode)
-		rewriteTestFuncNode(tfnode, testFunc, outputPath)
+		rewriteTestFuncNode(tfnode, testFunc, outputPath, g.Program)
 
 		var tnodes []ast.Node
 		for _, t := range testFunc.Tests {
@@ -332,7 +332,7 @@ func rewriteFileAst(fset *token.FileSet, f *ast.File, tfuncs TestFuncs, outputPa
 	}
 }
 
-func rewriteTestFuncNode(n ast.Node, tfunc TestFunc, outputPath string) {
+func rewriteTestFuncNode(n ast.Node, tfunc TestFunc, outputPath string, program *loader.Program) {
 	n.(*ast.FuncDecl).Name.Name = tfunc.Name
 	astutil.Apply(n, func(cr *astutil.Cursor) bool {
 		switch v := cr.Node().(type) {
@@ -342,8 +342,9 @@ func rewriteTestFuncNode(n ast.Node, tfunc TestFunc, outputPath string) {
 				if tfunc.RouterFunc.PackagePath == outputPath {
 					v.Fun = &ast.Ident{Name: tfunc.RouterFunc.Name}
 				} else {
+					packageInfo := program.Package(tfunc.RouterFunc.PackagePath)
 					v.Fun = &ast.SelectorExpr{
-						X:   &ast.Ident{Name: tfunc.RouterFunc.PackagePath},
+						X:   &ast.Ident{Name: packageInfo.Pkg.Name()},
 						Sel: &ast.Ident{Name: tfunc.RouterFunc.Name},
 					}
 				}

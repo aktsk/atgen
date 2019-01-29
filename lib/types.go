@@ -1,5 +1,7 @@
 package atgen
 
+import "golang.org/x/tools/go/loader"
+
 // Generator is the type for code generator
 type Generator struct {
 	Yaml                   string
@@ -9,6 +11,7 @@ type Generator struct {
 	RouterFuncs            []*RouterFunc
 	TestFuncs              TestFuncs
 	TestFuncsPerAPIVersion map[string]TestFuncs
+	Program                *loader.Program
 }
 
 // TestFuncs is a group of TestFunc
