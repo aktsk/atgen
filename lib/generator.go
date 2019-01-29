@@ -310,18 +310,6 @@ func getVersions(testFunc TestFunc) []string {
 	return deduped
 }
 
-func convertToOutputDirPath(outputDir string) (string, error) {
-	conf := loader.Config{}
-	conf.Import(".")
-	program, err := conf.Load()
-	if err != nil {
-		return "", err
-	}
-
-	currentPackagePath := program.Package(".").Pkg.Path()
-	return filepath.Join(currentPackagePath, outputDir), nil
-}
-
 func rewriteFileAst(fset *token.FileSet, f *ast.File, tfuncs TestFuncs, outputPath string) {
 	for _, tfunc := range tfuncs {
 		if tfunc.RouterFunc.PackagePath == outputPath {
