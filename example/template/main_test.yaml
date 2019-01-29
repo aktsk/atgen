@@ -45,7 +45,7 @@
   apiVersions:
     - v1
   tests:
-    - path: /{apiVersion/}
+    - path: /{apiVersion}/
       method: get
       res:
         status: 200
