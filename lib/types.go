@@ -1,13 +1,17 @@
 package atgen
 
+import "golang.org/x/tools/go/loader"
+
 // Generator is the type for code generator
 type Generator struct {
 	Yaml                   string
 	Template               string
 	TemplateDir            string
 	OutputDir              string
+	RouterFuncs            []*RouterFunc
 	TestFuncs              TestFuncs
 	TestFuncsPerAPIVersion map[string]TestFuncs
+	Program                *loader.Program
 }
 
 // TestFuncs is a group of TestFunc
@@ -15,10 +19,12 @@ type TestFuncs []TestFunc
 
 // TestFunc represents a test function
 type TestFunc struct {
-	Name        string
-	Tests       []Tester
-	APIVersions []string
-	Vars        map[string]interface{}
+	Name           string
+	Tests          []Tester
+	APIVersions    []string
+	RouterFuncName string
+	RouterFunc     *RouterFunc
+	Vars           map[string]interface{}
 }
 
 // Test represents a test in a test function
@@ -67,4 +73,10 @@ func (t Test) IsSubtests() bool {
 // IsSubtests returns true when t is Subtests
 func (t Subtests) IsSubtests() bool {
 	return true
+}
+
+// RouterFunc describe a function which should be called from test to get http.Handler
+type RouterFunc struct {
+	PackagePath string
+	Name        string
 }

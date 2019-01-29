@@ -200,3 +200,95 @@ func TestGetVersionsOfTestFuncAndTest(t *testing.T) {
 		t.Fatalf("versions[2] should be v1")
 	}
 }
+
+func TestAggregateRouterFunc(t *testing.T) {
+	testCases := []struct {
+		Name                string
+		Yaml                string
+		TemplatePackagePath string
+		ExpectedPackagePath string
+		ExpectedName        string
+	}{
+		{
+			Name: "Set router with function name only",
+			Yaml: `
+- name: TestSetRouterWithFunctionNameOnly
+  routerFunc: getRouter
+  apiVersions:
+    - v1
+  tests:
+    - path: /{apiVersion}/user
+      method: get
+      res:
+        status: 200
+        params:
+          foo: bar
+`,
+			TemplatePackagePath: "github.com/foo/bar/template",
+			ExpectedName:        "getRouter",
+			ExpectedPackagePath: "github.com/foo/bar/template",
+		},
+		{
+			Name: "Set router with relative path",
+			Yaml: `
+- name: TestSetRouterWithRelativePath
+  routerFunc: ../handlers.GetRouter
+  apiVersions:
+    - v1
+  tests:
+    - path: /{apiVersion}/user
+      method: get
+      res:
+        status: 200
+        params:
+          foo: bar
+`,
+			TemplatePackagePath: "github.com/foo/bar/template",
+			ExpectedName:        "GetRouter",
+			ExpectedPackagePath: "github.com/foo/bar/handlers",
+		},
+		{
+			Name: "Set router with absolute path",
+			Yaml: `
+- name: TestSetRouterWithAbsolute
+  routerFunc: github.com/foo/bar/handlers.GetRouter
+  apiVersions:
+    - v1
+  tests:
+    - path: /{apiVersion}/user
+      method: get
+      res:
+        status: 200
+        params:
+          foo: bar
+`,
+			TemplatePackagePath: "github.com/foo/bar/template",
+			ExpectedName:        "GetRouter",
+			ExpectedPackagePath: "github.com/foo/bar/handlers",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.Name, func(t *testing.T) {
+			parsed, err := parseYaml([]byte(testCase.Yaml))
+			if err != nil {
+				t.Fatal(err)
+			}
+			testFuncs := convertToTestFuncsHelper(t, parsed)
+			routerFuncs, _, err := aggregateRouterFunc(testFuncs, testCase.TemplatePackagePath)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			routerFunc := routerFuncs[0]
+
+			if routerFunc.Name != testCase.ExpectedName {
+				t.Errorf("Expected name is %s, but actually %s", testCase.ExpectedName, routerFunc.Name)
+			}
+
+			if routerFunc.PackagePath != testCase.ExpectedPackagePath {
+				t.Errorf("Expected package path is %s, but actually %s", testCase.ExpectedPackagePath, routerFunc.PackagePath)
+			}
+		})
+	}
+}
