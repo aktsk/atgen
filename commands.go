@@ -2,6 +2,7 @@ package main
 
 import (
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -90,17 +91,30 @@ func copyFile(s, d string) error {
 		return errors.WithStack(err)
 	}
 	defer src.Close()
+	dstdir := filepath.Dir(d)
 
-	dest, err := os.Create(d)
+	tmpdst, err := ioutil.TempFile(dstdir, "tmp-")
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	defer dest.Close()
+	defer (func() {
+		if tmpdst != nil {
+			f := tmpdst.Name()
+			_ = tmpdst.Close()
+			_ = os.Remove(f)
+		}
+	})()
 
-	_, err = io.Copy(dest, src)
+	_, err = io.Copy(tmpdst, src)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-
+	if err = tmpdst.Close(); err != nil {
+		return errors.WithStack(err)
+	}
+	if err = os.Rename(tmpdst.Name(), d); err != nil {
+		return errors.WithStack(err)
+	}
+	tmpdst = nil
 	return nil
 }
