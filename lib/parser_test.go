@@ -43,6 +43,10 @@ func TestParseTestFuncPerAPIVersion(t *testing.T) {
 	if test.Vars["foo"] != "bar" {
 		t.Fatal(`test.Vars["foo"] should be bar`)
 	}
+
+	if test.Register != "baz" {
+		t.Fatal("register should be baz")
+	}
 }
 
 func TestParseTestPerAPIVersion(t *testing.T) {

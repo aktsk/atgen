@@ -27,6 +27,7 @@ var yamlTestFuncPerAPIVersion = `
           foo: bar
       vars:
          foo: bar
+      register: baz
 `
 
 var yamlTestPerAPIVersion = `
