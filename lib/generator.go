@@ -354,6 +354,8 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 				v.Value = fmt.Sprintf(`"%s"`, test.Path)
 			case `"status"`:
 				v.Value = fmt.Sprintf("%d", test.Res.Status)
+			case `"registerKey"`:
+				v.Value = fmt.Sprintf(`"%s"`, test.Register)
 			}
 		case *ast.Ident:
 			ident = v.Name
