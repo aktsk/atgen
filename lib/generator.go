@@ -354,6 +354,8 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 				v.Value = fmt.Sprintf(`"%s"`, test.Path)
 			case `"status"`:
 				v.Value = fmt.Sprintf("%d", test.Res.Status)
+			case `"registerKey"`:
+				v.Value = fmt.Sprintf(`"%s"`, test.Register)
 			}
 		case *ast.Ident:
 			ident = v.Name
@@ -388,6 +390,11 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 				s = strings.TrimRight(s, `}"`)
 				t := strings.Split(s, ":")
 				v.Value = fmt.Sprintf(`vars["%s"].(%s)`, t[0], t[1])
+			} else if strings.HasPrefix(v.Value, `"$register[`) {
+				s := strings.TrimLeft(v.Value, `"$register[`)
+				s = strings.TrimRight(s, `]"`)
+				t := strings.Split(s, ".")
+				v.Value = fmt.Sprintf(`register["%s"].(map[string]interface{})["%s"].(string)`, t[0], t[1])
 			}
 		}
 		return true

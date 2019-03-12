@@ -35,6 +35,7 @@ type Test struct {
 	Req         Req
 	Res         Res
 	Vars        map[string]interface{}
+	Register    string
 }
 
 // Subtests is a group of Subtest

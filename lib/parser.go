@@ -258,6 +258,11 @@ func convertToTest(t map[interface{}]interface{}) (Test, error) {
 		return Test{}, err
 	}
 
+	register := ""
+	if t["register"] != nil {
+		register = t["register"].(string)
+	}
+
 	return Test{
 		APIVersions: apiVersions,
 		Path:        t["path"].(string),
@@ -265,6 +270,7 @@ func convertToTest(t map[interface{}]interface{}) (Test, error) {
 		Req:         req,
 		Res:         res,
 		Vars:        vars,
+		Register:    register,
 	}, nil
 }
 
