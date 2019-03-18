@@ -5,18 +5,14 @@ REVISION := $(shell git rev-parse --short HEAD)
 all: build
 
 setup:
-	go get github.com/golang/lint/golint
 	go get golang.org/x/tools/cmd/goimports
 	go get github.com/tcnksm/ghr
 	go get github.com/Songmu/goxz/cmd/goxz
 	go get github.com/motemen/gobump/cmd/gobump
 
-test: lint
+test:
 	go test ./lib
 	go test -race ./lib
-
-lint: setup
-	golint ./...
 
 fmt: setup
 	goimports -w .
