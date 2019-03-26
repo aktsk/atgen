@@ -16,7 +16,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"golang.org/x/tools/go/ast/astutil"
-	"golang.org/x/tools/go/loader"
+	"golang.org/x/tools/go/packages"
 )
 
 // RouterFuncName is function name to be replaced
@@ -320,7 +320,7 @@ func rewriteFileAst(fset *token.FileSet, f *ast.File, tfuncs TestFuncs, outputPa
 	}
 }
 
-func rewriteTestFuncNode(n ast.Node, tfunc TestFunc, outputPath string, program *loader.Program) {
+func rewriteTestFuncNode(n ast.Node, tfunc TestFunc, outputPath string, pkgs []*packages.Package) {
 	n.(*ast.FuncDecl).Name.Name = tfunc.Name
 	astutil.Apply(n, func(cr *astutil.Cursor) bool {
 		switch v := cr.Node().(type) {
@@ -330,9 +330,14 @@ func rewriteTestFuncNode(n ast.Node, tfunc TestFunc, outputPath string, program 
 				if tfunc.RouterFunc.PackagePath == outputPath {
 					v.Fun = &ast.Ident{Name: tfunc.RouterFunc.Name}
 				} else {
-					packageInfo := program.Package(tfunc.RouterFunc.PackagePath)
+					var pkg *packages.Package
+					for _, p := range pkgs {
+						if p.PkgPath == tfunc.RouterFunc.PackagePath {
+							pkg = p
+						}
+					}
 					v.Fun = &ast.SelectorExpr{
-						X:   &ast.Ident{Name: packageInfo.Pkg.Name()},
+						X:   &ast.Ident{Name: pkg.Name},
 						Sel: &ast.Ident{Name: tfunc.RouterFunc.Name},
 					}
 				}
