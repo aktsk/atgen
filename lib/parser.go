@@ -1,7 +1,6 @@
 package atgen
 
 import (
-	"fmt"
 	"go/types"
 	"io/ioutil"
 	"os"
@@ -10,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
-	"golang.org/x/tools/go/loader"
+	"golang.org/x/tools/go/packages"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -45,6 +44,7 @@ func (g *Generator) ParseYaml() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
 	program, err := loadUsingPackages(routerFuncs)
 	if err != nil {
 		return errors.WithStack(err)
@@ -124,7 +124,7 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) (TestFuncs, error)
 	return testFuncs, nil
 }
 
-func loadUsingPackages(routerFuncs []*RouterFunc) (*loader.Program, error) {
+func loadUsingPackages(routerFuncs []*RouterFunc) ([]*packages.Package, error) {
 	packagePaths := []string{"net/http"}
 
 	for _, routerFunc := range routerFuncs {
@@ -133,11 +133,19 @@ func loadUsingPackages(routerFuncs []*RouterFunc) (*loader.Program, error) {
 		}
 	}
 
-	conf := loader.Config{}
-	for _, packagePath := range packagePaths {
-		conf.Import(packagePath)
+	conf := &packages.Config{}
+	pkgs, err := packages.Load(conf, packagePaths...)
+	if err != nil {
+		return nil, errors.WithStack(err)
 	}
-	return conf.Load()
+
+	for _, pkg := range pkgs {
+		if pkg.Errors != nil {
+			return nil, errors.WithStack(pkg.Errors[0])
+		}
+	}
+
+	return pkgs, nil
 }
 
 func usingSamePackage(packagePaths []string, routerFunc *RouterFunc) bool {
@@ -186,16 +194,18 @@ func isRelativePath(path string) bool {
 	return strings.HasPrefix(path, ".")
 }
 
-func validateRouterFuncs(routerFuncs []*RouterFunc, program *loader.Program) error {
-	handlerObj := program.Package("net/http").Pkg.Scope().Lookup("Handler")
+func validateRouterFuncs(routerFuncs []*RouterFunc, program []*packages.Package) error {
+	conf := &packages.Config{Mode: packages.LoadAllSyntax}
 	for _, routerFunc := range routerFuncs {
-		pkg := program.Package(routerFunc.PackagePath)
-		if pkg == nil {
-			return errors.New(fmt.Sprintf("%s is not found in loaded packages", routerFunc.PackagePath))
+		pkgs, err := packages.Load(conf, "net/http", routerFunc.PackagePath)
+		if err != nil {
+			return errors.WithStack(err)
 		}
-		funcObj := pkg.Pkg.Scope().Lookup(routerFunc.Name)
 
-		err := validateRouterFuncObj(handlerObj, funcObj, routerFunc)
+		handlerObj := pkgs[0].Types.Scope().Lookup("Handler")
+		funcObj := pkgs[1].Types.Scope().Lookup(routerFunc.Name)
+
+		err = validateRouterFuncObj(handlerObj, funcObj, routerFunc)
 		if err != nil {
 			return err
 		}
