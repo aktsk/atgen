@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.5.0](https://github.com/aktsk/atgen/compare/v0.4.0...v0.5.0) (2019-04-08)
+
+* Replace TrimLeft and TrimRight with TrimPrefix and TrimSuffix [#12](https://github.com/aktsk/atgen/pull/12) ([mizzy](https://github.com/mizzy))
+
 ## [v0.4.0](https://github.com/aktsk/atgen/compare/v0.3.0...v0.4.0) (2019-04-01)
 
 * Use go/packages instead of go/loader [#11](https://github.com/aktsk/atgen/pull/11) ([mizzy](https://github.com/mizzy))
