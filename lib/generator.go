@@ -391,13 +391,13 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 		switch v := cr.Node().(type) {
 		case *ast.BasicLit:
 			if strings.HasPrefix(v.Value, `"${`) {
-				s := strings.TrimLeft(v.Value, `"${`)
-				s = strings.TrimRight(s, `}"`)
+				s := strings.TrimPrefix(v.Value, `"${`)
+				s = strings.TrimSuffix(s, `}"`)
 				t := strings.Split(s, ":")
 				v.Value = fmt.Sprintf(`vars["%s"].(%s)`, t[0], t[1])
 			} else if strings.HasPrefix(v.Value, `"$register[`) {
-				s := strings.TrimLeft(v.Value, `"$register[`)
-				s = strings.TrimRight(s, `]"`)
+				s := strings.TrimPrefix(v.Value, `"$register[`)
+				s = strings.TrimSuffix(s, `]"`)
 				t := strings.Split(s, ".")
 				v.Value = fmt.Sprintf(`register["%s"].(map[string]interface{})["%s"].(string)`, t[0], t[1])
 			}
