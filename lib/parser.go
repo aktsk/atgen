@@ -56,7 +56,6 @@ func (g *Generator) ParseYaml() error {
 	}
 
 	g.Program = program
-	g.RouterFuncs = routerFuncs
 	g.TestFuncs = testFuncs
 
 	return nil
