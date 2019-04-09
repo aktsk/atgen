@@ -8,7 +8,6 @@ type Generator struct {
 	Template               string
 	TemplateDir            string
 	OutputDir              string
-	RouterFuncs            []*RouterFunc
 	TestFuncs              TestFuncs
 	TestFuncsPerAPIVersion map[string]TestFuncs
 	Program                []*packages.Package
