@@ -193,18 +193,25 @@ func isRelativePath(path string) bool {
 	return strings.HasPrefix(path, ".")
 }
 
+var packageCache = map[string][]*packages.Package{}
+
 func validateRouterFuncs(routerFuncs []*RouterFunc, program []*packages.Package) error {
 	conf := &packages.Config{Mode: packages.LoadAllSyntax}
 	for _, routerFunc := range routerFuncs {
-		pkgs, err := packages.Load(conf, "net/http", routerFunc.PackagePath)
-		if err != nil {
-			return errors.WithStack(err)
+		path := routerFunc.PackagePath
+		if packageCache[path] == nil {
+			pkgs, err := packages.Load(conf, "net/http", path)
+			if err != nil {
+				return errors.WithStack(err)
+			}
+			packageCache[path] = pkgs
 		}
 
+		pkgs := packageCache[path]
 		handlerObj := pkgs[0].Types.Scope().Lookup("Handler")
 		funcObj := pkgs[1].Types.Scope().Lookup(routerFunc.Name)
 
-		err = validateRouterFuncObj(handlerObj, funcObj, routerFunc)
+		err := validateRouterFuncObj(handlerObj, funcObj, routerFunc)
 		if err != nil {
 			return err
 		}
