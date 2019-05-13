@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.6.0](https://github.com/aktsk/atgen/compare/v0.5.0...v0.6.0) (2019-05-13)
+
+* Cache results of packges.Load() to shorten execution time [#14](https://github.com/aktsk/atgen/pull/14) ([mizzy](https://github.com/mizzy))
+* Remove RouterFuncs of Generator struct [#13](https://github.com/aktsk/atgen/pull/13) ([mizzy](https://github.com/mizzy))
+
 ## [v0.5.0](https://github.com/aktsk/atgen/compare/v0.4.0...v0.5.0) (2019-04-08)
 
 * Replace TrimLeft and TrimRight with TrimPrefix and TrimSuffix [#12](https://github.com/aktsk/atgen/pull/12) ([mizzy](https://github.com/mizzy))
