@@ -193,7 +193,7 @@ func isRelativePath(path string) bool {
 	return strings.HasPrefix(path, ".")
 }
 
-var packageCache map[string][]*packages.Package = map[string][]*packages.Package{}
+var packageCache = map[string][]*packages.Package{}
 
 func validateRouterFuncs(routerFuncs []*RouterFunc, program []*packages.Package) error {
 	conf := &packages.Config{Mode: packages.LoadAllSyntax}
