@@ -43,7 +43,7 @@ func TestTeamplate(t *testing.T) {
 		// "atgenStatus" is replaced with res.status defined in YAML
 		if res.StatusCode != "atgenStatus" {
 			t.Log(res.Body)
-			t.Errorf("Expected status code should be %d, but actually %d", "status", res.StatusCode)
+			t.Errorf("Expected status code should be %d, but actually %d", "atgenStatus", res.StatusCode)
 		}
 
 		// This is replaced with req.headers defined in YAML
