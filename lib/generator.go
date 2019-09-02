@@ -20,7 +20,7 @@ import (
 )
 
 // RouterFuncName is function name to be replaced
-const RouterFuncName = "RouterFunc"
+const RouterFuncName = "AtgenRouterFunc"
 
 // Generate generates code and write to files
 func (g *Generator) Generate() error {
@@ -77,11 +77,11 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 	cmap := ast.NewCommentMap(fset, f, f.Comments)
 	for node, cgroups := range cmap {
 		for _, cgroup := range cgroups {
-			if strings.Contains(cgroup.Text(), "TestFunc block") {
+			if strings.Contains(cgroup.Text(), "Atgen TestFunc block") {
 				testFuncNode = node
-			} else if strings.Contains(cgroup.Text(), "Test block") {
+			} else if strings.Contains(cgroup.Text(), "Atgen Test block") {
 				testNode = node
-			} else if strings.Contains(cgroup.Text(), "Subtest block") {
+			} else if strings.Contains(cgroup.Text(), "Atgen Subtest block") {
 				subtestNode = node
 			}
 		}
@@ -130,7 +130,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 						switch v := cr.Node().(type) {
 						case *ast.BasicLit:
 							switch v.Value {
-							case `"SubtestName"`:
+							case `"AtgenSubtestName"`:
 								v.Value = fmt.Sprintf(`"%s"`, subtest.Name)
 							}
 						}
@@ -353,31 +353,31 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 		switch v := cr.Node().(type) {
 		case *ast.BasicLit:
 			switch v.Value {
-			case `"Method"`:
+			case `"AtgenMethod"`:
 				v.Value = fmt.Sprintf(`"%s"`, strings.ToUpper(test.Method))
-			case `"Path"`:
+			case `"AtgenPath"`:
 				v.Value = fmt.Sprintf(`"%s"`, test.Path)
-			case `"status"`:
+			case `"atgenStatus"`:
 				v.Value = fmt.Sprintf("%d", test.Res.Status)
-			case `"registerKey"`:
+			case `"atgenRegisterKey"`:
 				v.Value = fmt.Sprintf(`"%s"`, test.Register)
 			}
 		case *ast.Ident:
 			ident = v.Name
 		case *ast.CompositeLit:
-			if ident == "reqHeaders" {
+			if ident == "atgenReqHeaders" {
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Req.Headers))
 				cr.Replace(h)
-			} else if ident == "reqParams" {
+			} else if ident == "atgenReqParams" {
 				p, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Req.Params))
 				cr.Replace(p)
-			} else if ident == "resHeaders" {
+			} else if ident == "atgenResHeaders" {
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Headers))
 				cr.Replace(h)
-			} else if ident == "resParams" {
+			} else if ident == "atgenResParams" {
 				p, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Params))
 				cr.Replace(p)
-			} else if ident == "testVars" {
+			} else if ident == "atgenTestVars" {
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Vars))
 				cr.Replace(h)
 			}
@@ -395,11 +395,11 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 				s = strings.TrimSuffix(s, `}"`)
 				t := strings.Split(s, ":")
 				v.Value = fmt.Sprintf(`vars["%s"].(%s)`, t[0], t[1])
-			} else if strings.HasPrefix(v.Value, `"$register[`) {
-				s := strings.TrimPrefix(v.Value, `"$register[`)
+			} else if strings.HasPrefix(v.Value, `"$atgenRegister[`) {
+				s := strings.TrimPrefix(v.Value, `"$atgenRegister[`)
 				s = strings.TrimSuffix(s, `]"`)
 				t := strings.Split(s, ".")
-				v.Value = fmt.Sprintf(`register["%s"].(map[string]interface{})["%s"].(string)`, t[0], t[1])
+				v.Value = fmt.Sprintf(`atgenRegister["%s"].(map[string]interface{})["%s"].(string)`, t[0], t[1])
 			}
 		}
 		return true
