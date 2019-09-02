@@ -8,47 +8,47 @@ import (
 	"testing"
 )
 
-// TestFunc block
+// Atgen TestFunc block
 // You must write above comment to point this is a test function.
 func TestTeamplate(t *testing.T) {
-	r := RouterFunc()
+	r := AtgenRouterFunc()
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
 	client := new(http.Client)
 
-	// Test block
+	// Atgen Test block
 	// You must write above comment to point this is a test code template
 	// Atgen generates test code from this block.
 	{
 
 		// This is replaced with req.params defined in YAML
-		reqParams := map[string]interface{}{}
-		reqBody, _ := json.Marshal(reqParams)
+		atgenReqParams := map[string]interface{}{}
+		reqBody, _ := json.Marshal(atgenReqParams)
 
 		req, _ := http.NewRequest(
-			"Method",      // This is replaced with method defined in YAML
-			ts.URL+"Path", // This is replaced with path defined in YAML
+			"AtgenMethod",      // This is replaced with method defined in YAML
+			ts.URL+"AtgenPath", // This is replaced with path defined in YAML
 			bytes.NewReader(reqBody),
 		)
 
 		// This is replaced with req.headers defined in YAML
-		reqHeaders := map[string]interface{}{}
-		for h, v := range reqHeaders {
+		atgenReqHeaders := map[string]interface{}{}
+		for h, v := range atgenReqHeaders {
 			req.Header.Set(h, v)
 		}
 
 		res, _ := client.Do(req)
 
-		// "status" is replaced with res.status defined in YAML
-		if res.StatusCode != "status" {
+		// "atgenStatus" is replaced with res.status defined in YAML
+		if res.StatusCode != "atgenStatus" {
 			t.Log(res.Body)
 			t.Errorf("Expected status code should be %d, but actually %d", "status", res.StatusCode)
 		}
 
 		// This is replaced with req.headers defined in YAML
-		resHeaders := map[string]string{}
-		for h, v := range resHeaders {
+		atgenResHeaders := map[string]string{}
+		for h, v := range atgenResHeaders {
 			actually := res.Header.Get(h)
 			if actually != v {
 				t.Errorf("%v header should be %v, but actually %v", h, v, actually)
@@ -68,8 +68,8 @@ func TestTeamplate(t *testing.T) {
 		}
 
 		// This is replaced with req.params defined in YAML
-		resParams := map[string]interface{}{}
-		for k, v := range resParams {
+		atgenResParams := map[string]interface{}{}
+		for k, v := range atgenResParams {
 			if params[k] != v {
 				t.Fatalf("params[%#v] should be %#v, but %#v", k, v, params[k])
 			}
