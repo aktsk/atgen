@@ -121,7 +121,10 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 			switch test := t.(type) {
 			case Test:
 				tnode := util.DuplicateNode(testNode)
-				tnode = rewriteTestNode(tnode, test)
+				tnode, err = rewriteTestNode(tnode, test)
+				if err != nil {
+					return errors.WithStack(err)
+				}
 				tnodes = append(tnodes, tnode)
 			case Subtests:
 				for _, subtest := range test {
@@ -140,7 +143,10 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 					var tests []ast.Node
 					for _, test := range subtest.Tests {
 						tnode := util.DuplicateNode(testNode)
-						tnode = rewriteTestNode(tnode, test)
+						tnode, err = rewriteTestNode(tnode, test)
+						if err != nil {
+							return errors.WithStack(err)
+						}
 						tests = append(tests, tnode)
 					}
 					subtnode = rewriteSubtestNode(subtnode, tests)
@@ -347,8 +353,9 @@ func rewriteTestFuncNode(n ast.Node, tfunc TestFunc, outputPath string, pkgs []*
 	}, nil)
 }
 
-func rewriteTestNode(n ast.Node, test Test) ast.Node {
+func rewriteTestNode(n ast.Node, test Test) (ast.Node, error) {
 	var ident string
+	var err error
 	astutil.Apply(n, func(cr *astutil.Cursor) bool {
 		switch v := cr.Node().(type) {
 		case *ast.BasicLit:
@@ -364,20 +371,27 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 			}
 		case *ast.Ident:
 			ident = v.Name
+		case *ast.CallExpr:
+			ident, ok := v.Fun.(*ast.Ident)
+			if ok && ident.Name == "AtgenRequestBody" {
+				h, _ := parser.ParseExpr(`json.Marshal(atgenReqParams)`)
+				cr.Replace(h)
+			}
 		case *ast.CompositeLit:
-			if ident == "atgenReqHeaders" {
+			switch ident {
+			case "atgenReqHeaders":
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Req.Headers))
 				cr.Replace(h)
-			} else if ident == "atgenReqParams" {
+			case "atgenReqParams":
 				p, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Req.Params))
 				cr.Replace(p)
-			} else if ident == "atgenResHeaders" {
+			case "atgenResHeaders":
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Headers))
 				cr.Replace(h)
-			} else if ident == "atgenResParams" {
+			case "atgenResParams":
 				p, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Params))
 				cr.Replace(p)
-			} else if ident == "atgenTestVars" {
+			case "atgenTestVars":
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Vars))
 				cr.Replace(h)
 			}
@@ -405,5 +419,5 @@ func rewriteTestNode(n ast.Node, test Test) ast.Node {
 		return true
 	}, nil)
 
-	return n
+	return n, err
 }
