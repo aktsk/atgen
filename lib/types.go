@@ -48,10 +48,23 @@ type Subtest struct {
 }
 
 // Req is a request parameters and headers which a test should throw
+// Body only uses when Type is RAW
+// Default Type is JSON
 type Req struct {
 	Params  map[string]interface{}
 	Headers map[string]string
+	Body    string
+	Type    Type
 }
+
+// Type is a type of request body
+type Type int
+
+const (
+	JSON Type = iota
+	FORM
+	RAW
+)
 
 // Res is a response status, parameters and headers which a test should get
 type Res struct {
