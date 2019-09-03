@@ -120,6 +120,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 		for _, t := range testFunc.Tests {
 			switch test := t.(type) {
 			case Test:
+				addAdditionalImports(test.Req.Type, fset, f)
 				tnode := util.DuplicateNode(testNode)
 				tnode, err = rewriteTestNode(tnode, test)
 				if err != nil {
@@ -142,6 +143,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 
 					var tests []ast.Node
 					for _, test := range subtest.Tests {
+						addAdditionalImports(test.Req.Type, fset, f)
 						tnode := util.DuplicateNode(testNode)
 						tnode, err = rewriteTestNode(tnode, test)
 						if err != nil {
@@ -454,4 +456,15 @@ func generateRequestBody(req Req) ast.Expr {
 		return expr
 	}
 	return nil
+}
+
+func addAdditionalImports(typ Type, fset *token.FileSet, f *ast.File) {
+	switch typ {
+	case JSON:
+	case RAW:
+	case FORM:
+		astutil.AddImport(fset, f, "fmt")
+		astutil.AddImport(fset, f, "net/url")
+
+	}
 }
