@@ -20,6 +20,7 @@
     - path: /{apiVersion}/people/3
       method: post
       req:
+        type: json
         params:
           firstname: Jane
           lastname: Doe
@@ -40,6 +41,44 @@
       res:
         status: 404
 
+- name: TestPostPersonUsingRaw
+  routerFunc: github.com/aktsk/atgen/example.getRouter
+  apiVersions:
+    - v1
+  tests:
+    - path: /{apiVersion}/people/3
+      method: post
+      req:
+        type: raw
+        body: |
+          {"firstname": "Jane", "lastname": "Doe"}
+      res:
+        params:
+          id: "3"
+          firstname: Jane
+          lastname: Doe
+        status: 200
+
+- name: TestPostPersonUsingForm
+  routerFunc: github.com/aktsk/atgen/example.getRouter
+  apiVersions:
+    - v1
+  tests:
+    - path: /{apiVersion}/form/people/3
+      method: post
+      req:
+        type: form
+        params:
+          firstname: Jane
+          lastname: Doe
+      res:
+        params:
+          id: "3"
+          firstname: Jane
+          lastname: Doe
+        status: 200
+
+
 - name: TestPostSameLastNamePerson
   routerFunc: github.com/aktsk/atgen/example.getRouter
   apiVersions:
@@ -48,6 +87,7 @@
     - path: /{apiVersion}/people/3
       method: post
       req:
+        type: json
         params:
           firstname: Jane
           lastname: Doe
@@ -57,6 +97,7 @@
     - path: /{apiVersion}/people/4
       method: post
       req:
+        type: json
         params:
           firstname: James
           lastname: $atgenRegister[person.lastname]
