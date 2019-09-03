@@ -23,13 +23,12 @@ func TestTeamplate(t *testing.T) {
 	{
 
 		// This is replaced with req.params defined in YAML
-		atgenReqParams := map[string]interface{}{}
-		reqBody, _ := json.Marshal(atgenReqParams)
+		atgenReqBody := []byte{}
 
 		req, _ := http.NewRequest(
 			"AtgenMethod",      // This is replaced with method defined in YAML
 			ts.URL+"AtgenPath", // This is replaced with path defined in YAML
-			bytes.NewReader(reqBody),
+			bytes.NewReader(atgenReqBody),
 		)
 
 		// This is replaced with req.headers defined in YAML
