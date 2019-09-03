@@ -3,8 +3,8 @@ package atgen
 import (
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/parser"
-	"go/printer"
 	"go/token"
 	"io"
 	"io/ioutil"
@@ -199,9 +199,9 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 	}, nil)
 
 	f.Comments = cmap.Filter(f).Comments()
-	printer.Fprint(w, fset, f)
+	err = format.Node(w, fset, f)
 
-	return nil
+	return err
 }
 
 func rewriteSubtestNode(subtest ast.Node, tests []ast.Node) ast.Node {
