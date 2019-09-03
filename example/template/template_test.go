@@ -15,6 +15,8 @@ func TestTeamplate(t *testing.T) {
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
+	atgenRegister := map[string]interface{}{}
+
 	client := new(http.Client)
 
 	// Atgen Test block
@@ -23,7 +25,8 @@ func TestTeamplate(t *testing.T) {
 	{
 
 		// This is replaced with req.params defined in YAML
-		atgenReqBody := []byte{}
+		atgenReqParams := map[string]interface{}{}
+		atgenReqBody, _ := AtgenRequestBody()
 
 		req, _ := http.NewRequest(
 			"AtgenMethod",      // This is replaced with method defined in YAML
@@ -73,6 +76,8 @@ func TestTeamplate(t *testing.T) {
 				t.Fatalf("params[%#v] should be %#v, but %#v", k, v, params[k])
 			}
 		}
+
+		atgenRegister["atgenRegisterKey"] = params
 	}
 
 	// Generated test code is inserted here.

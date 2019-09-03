@@ -1,7 +1,6 @@
 package atgen
 
 import (
-	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -372,19 +371,20 @@ func rewriteTestNode(n ast.Node, test Test) (ast.Node, error) {
 			}
 		case *ast.Ident:
 			ident = v.Name
+		case *ast.CallExpr:
+			ident, ok := v.Fun.(*ast.Ident)
+			if ok && ident.Name == "AtgenRequestBody" {
+				h, _ := parser.ParseExpr(`json.Marshal(atgenReqParams)`)
+				cr.Replace(h)
+			}
 		case *ast.CompositeLit:
 			switch ident {
 			case "atgenReqHeaders":
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Req.Headers))
 				cr.Replace(h)
-			case "atgenReqBody":
-				body, internalErr := json.Marshal(test.Req.Params)
-				if internalErr != nil {
-					err = errors.WithStack(internalErr)
-					return false
-				}
-				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", body))
-				cr.Replace(h)
+			case "atgenReqParams":
+				p, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Req.Params))
+				cr.Replace(p)
 			case "atgenResHeaders":
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Headers))
 				cr.Replace(h)
