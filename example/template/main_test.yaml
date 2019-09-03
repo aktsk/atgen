@@ -40,6 +40,30 @@
       res:
         status: 404
 
+- name: TestPostSameLastNamePerson
+  routerFunc: github.com/aktsk/atgen/example.getRouter
+  apiVersions:
+    - v1
+  tests:
+    - path: /{apiVersion}/people/3
+      method: post
+      req:
+        params:
+          firstname: Jane
+          lastname: Doe
+      res:
+        status: 200
+      register: person
+    - path: /{apiVersion}/people/4
+      method: post
+      req:
+        params:
+          firstname: James
+          lastname: $atgenRegister[person.lastname]
+      res:
+        status: 200
+
+
 - name: TestDummyRouter
   routerFunc: ../handlers.DummyRouter
   apiVersions:
