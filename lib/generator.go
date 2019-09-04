@@ -168,7 +168,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 			case *ast.Ident:
 				ident = v.Name
 			case *ast.CompositeLit:
-				if ident == "vars" {
+				if ident == "atgenVars" {
 					h, _ := parser.ParseExpr(fmt.Sprintf("%#v", testFunc.Vars))
 					cr.Replace(h)
 				}
@@ -408,7 +408,7 @@ func rewriteTestNode(n ast.Node, test Test) (ast.Node, error) {
 				s := strings.TrimPrefix(v.Value, `"${`)
 				s = strings.TrimSuffix(s, `}"`)
 				t := strings.Split(s, ":")
-				v.Value = fmt.Sprintf(`vars["%s"].(%s)`, t[0], t[1])
+				v.Value = fmt.Sprintf(`atgenVars["%s"].(%s)`, t[0], t[1])
 			} else if strings.HasPrefix(v.Value, `"$atgenRegister[`) {
 				s := strings.TrimPrefix(v.Value, `"$atgenRegister[`)
 				s = strings.TrimSuffix(s, `]"`)
