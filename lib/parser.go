@@ -344,7 +344,11 @@ func convertToReq(r interface{}) (Req, error) {
 		case "raw":
 			typ = RAW
 			contentType = "application/octet-stream"
+		default:
+			return Req{}, errors.New("request type must be json, form or raw")
 		}
+	} else {
+		return Req{}, errors.New("request type must be defined")
 	}
 
 	if _, ok := headers["Content-Type"]; !ok {
