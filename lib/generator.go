@@ -449,9 +449,21 @@ func generateRequestBody(req Req) ast.Expr {
 		expr, _ := parser.ParseExpr(fun)
 		return expr
 	case RAW:
-		fun := fmt.Sprintf(`func () (body []byte,err error){ 
-			body = []byte(%#v) 
-			return }()`, req.Body)
+		fun := fmt.Sprintf(`func() (body []byte, err error) {
+			tmpl, err := template.New("body").Parse("{{.body}}")
+			if err != nil {
+				return
+			}
+			if tmpl != nil {
+				buf := bytes.NewBuffer([]byte{})
+				err = tmpl.Execute(buf, map[string]string{"body": %#v})
+				if err != nil {
+					return
+				}
+				body = buf.Bytes()
+			}
+			return
+		}()`, req.Body)
 		expr, _ := parser.ParseExpr(fun)
 		return expr
 	}
@@ -465,6 +477,8 @@ func addAdditionalImports(typ Type, fset *token.FileSet, f *ast.File) {
 	case FORM:
 		astutil.AddImport(fset, f, "fmt")
 		astutil.AddImport(fset, f, "net/url")
+		astutil.AddImport(fset, f, "bytes")
+		astutil.AddImport(fset, f, "text/template")
 
 	}
 }
