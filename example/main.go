@@ -52,6 +52,18 @@ func CreatePerson(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(person)
 }
 
+// CreatePersonFromForm creates a new item using form data
+func CreatePersonFromForm(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	_ = r.ParseForm()
+	person := &Person{}
+	person.ID = params["id"]
+	person.Firstname = r.Form.Get("firstname")
+	person.Lastname = r.Form.Get("lastname")
+
+	json.NewEncoder(w).Encode(person)
+}
+
 // DeletePerson deletes an item
 func DeletePerson(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -76,6 +88,7 @@ func getRouter() *mux.Router {
 	router.HandleFunc("/v1/people", GetPeople).Methods("GET")
 	router.HandleFunc("/v1/people/{id}", GetPerson).Methods("GET")
 	router.HandleFunc("/v1/people/{id}", CreatePerson).Methods("POST")
+	router.HandleFunc("/v1/form/people/{id}", CreatePersonFromForm).Methods("POST")
 	router.HandleFunc("/v1/people/{id}", DeletePerson).Methods("DELETE")
 	return router
 }

@@ -13,7 +13,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// ParseYaml parses yaml which deifnes test requests/responses
+// ParseYaml parses yaml which defines test requests/responses
 // and convert it to types defined in types.go
 func (g *Generator) ParseYaml() error {
 	buf, err := ioutil.ReadFile(g.Yaml)
@@ -326,9 +326,40 @@ func convertToReq(r interface{}) (Req, error) {
 		return Req{}, err
 	}
 
+	body := ""
+	if b, ok := req["body"].(string); ok {
+		body = b
+	}
+
+	typ := JSON
+	contentType := ""
+	if typStr, ok := req["type"].(string); ok {
+		switch typStr {
+		case "json":
+			typ = JSON
+			contentType = "application/json"
+		case "form":
+			typ = FORM
+			contentType = "application/x-www-form-urlencoded"
+		case "raw":
+			typ = RAW
+			contentType = "application/octet-stream"
+		default:
+			return Req{}, errors.New("request type must be json, form or raw")
+		}
+	} else {
+		return Req{}, errors.New("request type must be defined")
+	}
+
+	if _, ok := headers["Content-Type"]; !ok {
+		headers["Content-Type"] = contentType
+	}
+
 	return Req{
 		Params:  params,
 		Headers: headers,
+		Body:    body,
+		Type:    typ,
 	}, nil
 }
 

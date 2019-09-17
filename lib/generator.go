@@ -120,6 +120,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 		for _, t := range testFunc.Tests {
 			switch test := t.(type) {
 			case Test:
+				addAdditionalImports(test.Req.Type, fset, f)
 				tnode := util.DuplicateNode(testNode)
 				tnode, err = rewriteTestNode(tnode, test)
 				if err != nil {
@@ -142,6 +143,7 @@ func (g *Generator) generateTestFuncs(version string, testFuncs TestFuncs, w io.
 
 					var tests []ast.Node
 					for _, test := range subtest.Tests {
+						addAdditionalImports(test.Req.Type, fset, f)
 						tnode := util.DuplicateNode(testNode)
 						tnode, err = rewriteTestNode(tnode, test)
 						if err != nil {
@@ -374,8 +376,14 @@ func rewriteTestNode(n ast.Node, test Test) (ast.Node, error) {
 		case *ast.CallExpr:
 			ident, ok := v.Fun.(*ast.Ident)
 			if ok && ident.Name == "AtgenRequestBody" {
-				h, _ := parser.ParseExpr(`json.Marshal(atgenReqParams)`)
-				cr.Replace(h)
+				expr := generateRequestBody(test.Req)
+				if expr != nil {
+					cr.Replace(expr)
+				}
+			}
+		case *ast.AssignStmt:
+			if v, ok := v.Lhs[0].(*ast.Ident); ok && test.Req.Type == RAW && v.Name == "atgenReqParams" {
+				cr.Delete()
 			}
 		case *ast.CompositeLit:
 			switch ident {
@@ -383,8 +391,10 @@ func rewriteTestNode(n ast.Node, test Test) (ast.Node, error) {
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Req.Headers))
 				cr.Replace(h)
 			case "atgenReqParams":
-				p, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Req.Params))
-				cr.Replace(p)
+				if test.Req.Type != RAW {
+					p, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Req.Params))
+					cr.Replace(p)
+				}
 			case "atgenResHeaders":
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Headers))
 				cr.Replace(h)
@@ -420,4 +430,55 @@ func rewriteTestNode(n ast.Node, test Test) (ast.Node, error) {
 	}, nil)
 
 	return n, err
+}
+
+func generateRequestBody(req Req) ast.Expr {
+	switch req.Type {
+	case JSON:
+		expr, _ := parser.ParseExpr(`json.Marshal(atgenReqParams)`)
+		return expr
+	case FORM:
+		fun := `func () ([]byte, error){
+			body := url.Values{}
+			for k, v := range atgenReqParams {
+				body.Add(k, fmt.Sprintf("%v", v))
+			}
+			return []byte(body.Encode()),nil
+			}()`
+
+		expr, _ := parser.ParseExpr(fun)
+		return expr
+	case RAW:
+		fun := fmt.Sprintf(`func() (body []byte, err error) {
+			tmpl, err := template.New("body").Parse("{{.body}}")
+			if err != nil {
+				return
+			}
+			if tmpl != nil {
+				buf := bytes.NewBuffer([]byte{})
+				err = tmpl.Execute(buf, map[string]string{"body": %#v})
+				if err != nil {
+					return
+				}
+				body = buf.Bytes()
+			}
+			return
+		}()`, req.Body)
+		expr, _ := parser.ParseExpr(fun)
+		return expr
+	}
+	return nil
+}
+
+func addAdditionalImports(typ Type, fset *token.FileSet, f *ast.File) {
+	switch typ {
+	case JSON:
+	case RAW:
+	case FORM:
+		astutil.AddImport(fset, f, "fmt")
+		astutil.AddImport(fset, f, "net/url")
+		astutil.AddImport(fset, f, "bytes")
+		astutil.AddImport(fset, f, "text/template")
+
+	}
 }
