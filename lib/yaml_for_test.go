@@ -15,6 +15,7 @@ var yamlTestFuncPerAPIVersion = `
     - path: /{apiVersion}/user
       method: post
       req:
+        type: form
         params:
           userId: "1"
           name: John
@@ -41,6 +42,7 @@ var yamlTestPerAPIVersion = `
       path: /{apiVersion}/user
       method: post
       req:
+        type: form
         params:
           userId: "1"
           name: John
@@ -55,6 +57,7 @@ var yamlTestPerAPIVersion = `
       path: /{apiVersion}/user
       method: post
       req:
+        type: form
         params:
           userId: "1"
           name: John
@@ -80,6 +83,7 @@ var yamlTestFuncAndTestPerAPIVersion = `
       path: /{apiVersion}/user
       method: post
       req:
+        type: form
         params:
           userId: "1"
           name: John
@@ -94,6 +98,7 @@ var yamlTestFuncAndTestPerAPIVersion = `
       path: /{apiVersion}/user
       method: post
       req:
+        type: form
         params:
           userId: "1"
           name: John
@@ -114,6 +119,7 @@ var yamlTestFuncWithSubtests = `
     - path: /{apiVersion}/user
       method: post
       req:
+        type: form
         params:
           userId: "1"
           name: John
