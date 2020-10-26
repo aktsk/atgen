@@ -28,8 +28,10 @@ require (
 	github.com/ulikunitz/xz v0.5.5 // indirect
 	github.com/urfave/cli v1.20.0
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
+	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
 	golang.org/x/lint v0.0.0-20181217174547-8f45f776aaf1 // indirect
 	golang.org/x/oauth2 v0.0.0-20190115181402-5dab4167f31c // indirect
+	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/tools v0.0.0-20190128232029-0a99049195af
 	gopkg.in/yaml.v2 v2.2.2
 )
