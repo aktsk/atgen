@@ -4,10 +4,10 @@ You can try to run this example like this.
 
 ```
 go build ..
-./atgen gen --templateDir=./template
+./atgen gen --templateDir=./template --outputDir=./generated
 ```
 
-This generates `v1_main_test.go` .
+This generates `./generated/v1_main_test.go` .
 
 Run generated test code by this command.
 

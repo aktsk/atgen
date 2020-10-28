@@ -114,3 +114,30 @@
       method: get
       res:
         status: 200
+
+- name: TestNestDataInRegister
+  routerFunc: github.com/aktsk/atgen/example.getRouter
+  apiVersions:
+    - v1
+  tests:
+    - path: /{apiVersion}/people/5
+      method: post
+      req:
+        type: json
+        params:
+          firstname: Jane
+          lastname: Doe
+          address:
+            city: City X
+            state: State X
+      res:
+        status: 200
+      register: person
+    - path: /{apiVersion}/people/5
+      method: get
+      res:
+        status: 200
+        params:
+          firstname: Jane
+          address:
+            city: $atgenRegister[person.address.city]
