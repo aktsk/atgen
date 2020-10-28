@@ -423,7 +423,12 @@ func rewriteTestNode(n ast.Node, test Test) (ast.Node, error) {
 				s := strings.TrimPrefix(v.Value, `"$atgenRegister[`)
 				s = strings.TrimSuffix(s, `]"`)
 				t := strings.Split(s, ".")
-				v.Value = fmt.Sprintf(`atgenRegister["%s"].(map[string]interface{})["%s"].(string)`, t[0], t[1])
+				var value = fmt.Sprintf(`atgenRegister["%s"]`, t[0])
+				for i := 1; i < len(t); i++ {
+					value += fmt.Sprintf(`.(map[string]interface{})["%s"]`, t[i])
+				}
+				value += ".(string)"
+				v.Value = value
 			}
 		}
 		return true
