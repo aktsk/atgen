@@ -27,7 +27,9 @@ var people []Person
 
 // GetPeople displays all from the people var
 func GetPeople(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(people)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"people": people,
+	})
 }
 
 // GetPerson displays a single data
