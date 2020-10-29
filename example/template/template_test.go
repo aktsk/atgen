@@ -71,11 +71,7 @@ func TestTeamplate(t *testing.T) {
 
 		// This is replaced with req.params defined in YAML
 		atgenResParams := map[string]interface{}{}
-		err := compare(t, params, atgenResParams)
-		if err != nil {
-			t.Log(params)
-			t.Fatal(err)
-		}
+		checkCompare(t, params, atgenResParams)
 
 		atgenRegister["atgenRegisterKey"] = params
 	}
