@@ -1,2 +1,5 @@
 bin/atgen
 pkg/
+
+# GoLand
+.idea
