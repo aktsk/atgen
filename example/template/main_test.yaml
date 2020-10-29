@@ -1,5 +1,5 @@
 - name: TestGetPerson
-  routerFunc: github.com/aktsk/atgen/example.getRouter
+  routerFunc: ../handlers.GetRouter
   apiVersions:
     - v1
   tests:
@@ -13,7 +13,7 @@
           lastname: Doe
 
 - name: TestPostAndDeletePerson
-  routerFunc: github.com/aktsk/atgen/example.getRouter
+  routerFunc: ../handlers.GetRouter
   apiVersions:
     - v1
   tests:
@@ -42,7 +42,7 @@
         status: 404
 
 - name: TestPostPersonUsingRaw
-  routerFunc: github.com/aktsk/atgen/example.getRouter
+  routerFunc: ../handlers.GetRouter
   apiVersions:
     - v1
   tests:
@@ -60,7 +60,7 @@
         status: 200
 
 - name: TestPostPersonUsingForm
-  routerFunc: github.com/aktsk/atgen/example.getRouter
+  routerFunc: ../handlers.GetRouter
   apiVersions:
     - v1
   tests:
@@ -80,7 +80,7 @@
 
 
 - name: TestPostSameLastNamePerson
-  routerFunc: github.com/aktsk/atgen/example.getRouter
+  routerFunc: ../handlers.GetRouter
   apiVersions:
     - v1
   tests:
@@ -106,7 +106,7 @@
 
 
 - name: TestDummyRouter
-  routerFunc: ../handlers.DummyRouter
+  routerFunc: ../handlers.GetDummyRouter
   apiVersions:
     - v1
   tests:
@@ -116,7 +116,7 @@
         status: 200
 
 - name: TestNestDataInRegister
-  routerFunc: github.com/aktsk/atgen/example.getRouter
+  routerFunc: ../handlers.GetRouter
   apiVersions:
     - v1
   tests:
