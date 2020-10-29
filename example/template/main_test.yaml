@@ -141,3 +141,20 @@
           firstname: Jane
           address:
             city: $atgenRegister[person.address.city]
+
+- name: TestNestedDataInRegister
+  routerFunc: ../handlers.GetRouter
+  apiVersions:
+    - v1
+  tests:
+    - path: /{apiVersion}/people
+      method: get
+      res:
+        status: 200
+      register: people
+    - path: /{apiVersion}/people/1
+      method: get
+      res:
+        status: 200
+        params:
+          firstname: $atgenRegister[people.people[0].firstname]
