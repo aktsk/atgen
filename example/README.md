@@ -12,7 +12,7 @@ This generates `./generated/v1_main_test.go` .
 Run generated test code by this command.
 
 ```
-go test
+go test ./generated
 ```
 
 
