@@ -1,5 +1,16 @@
 # Changelog
 
+## [v0.7.0](https://github.com/aktsk/atgen/compare/v0.6.0...v0.7.0) (2020-10-30)
+
+* Access nested data with register [#27](https://github.com/aktsk/atgen/pull/27) ([takanakahiko](https://github.com/takanakahiko))
+* Test on GitHub Actions [#26](https://github.com/aktsk/atgen/pull/26) ([takanakahiko](https://github.com/takanakahiko))
+* Support form and raw type request body [#22](https://github.com/aktsk/atgen/pull/22) ([p1ass](https://github.com/p1ass))
+* Fix variable name from vars to atgenVars [#24](https://github.com/aktsk/atgen/pull/24) ([p1ass](https://github.com/p1ass))
+* Change to use format.Node when writing generated code [#23](https://github.com/aktsk/atgen/pull/23) ([p1ass](https://github.com/p1ass))
+* Generate http request body in Atgen [#21](https://github.com/aktsk/atgen/pull/21) ([p1ass](https://github.com/p1ass))
+* Fix to replace status to atgenStatus for placeholder [#19](https://github.com/aktsk/atgen/pull/19) ([p1ass](https://github.com/p1ass))
+* Add Atgen prefix before functions and variables replaced by atgen [#18](https://github.com/aktsk/atgen/pull/18) ([p1ass](https://github.com/p1ass))
+
 ## [v0.6.0](https://github.com/aktsk/atgen/compare/v0.5.0...v0.6.0) (2019-05-13)
 
 * Cache results of packges.Load() to shorten execution time [#14](https://github.com/aktsk/atgen/pull/14) ([mizzy](https://github.com/mizzy))

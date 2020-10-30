@@ -8,7 +8,8 @@ setup:
 	go get golang.org/x/tools/cmd/goimports
 	go get github.com/tcnksm/ghr
 	go get github.com/Songmu/goxz/cmd/goxz
-	go get github.com/motemen/gobump/cmd/gobump
+	go get github.com/x-motemen/gobump/cmd/gobump
+	go get github.com/Songmu/ghch/cmd/ghch
 
 test:
 	go test ./lib
