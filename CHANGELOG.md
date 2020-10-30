@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.7.0](https://github.com/aktsk/atgen/compare/v0.6.0...v0.7.0) (2020-10-30)
+
+* [Feature] Add Atgen prefix before functions and variables replaced by atgen #18 #19 #24 ([p1ass](https://github.com/p1ass))
+* [Feature] Generate http request body in Atgen #21 ([p1ass](https://github.com/p1ass))
+* [Feature] Access nested data with register #27 ([takanakahiko](https://github.com/takanakahiko))
+* [Internal] Change to use format.Node when writing generated code #23 ([p1ass](https://github.com/p1ass))
+* [Internal] Test on GitHub Actions #26 ([takanakahiko](https://github.com/takanakahiko))
+
 ## [v0.6.0](https://github.com/aktsk/atgen/compare/v0.5.0...v0.6.0) (2019-05-13)
 
 * Cache results of packges.Load() to shorten execution time [#14](https://github.com/aktsk/atgen/pull/14) ([mizzy](https://github.com/mizzy))
