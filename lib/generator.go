@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	util "github.com/lkesteloot/astutil"
@@ -420,10 +421,7 @@ func rewriteTestNode(n ast.Node, test Test) (ast.Node, error) {
 				t := strings.Split(s, ":")
 				v.Value = fmt.Sprintf(`atgenVars["%s"].(%s)`, t[0], t[1])
 			} else if strings.HasPrefix(v.Value, `"$atgenRegister[`) {
-				s := strings.TrimPrefix(v.Value, `"$atgenRegister[`)
-				s = strings.TrimSuffix(s, `]"`)
-				t := strings.Split(s, ".")
-				v.Value = fmt.Sprintf(`atgenRegister["%s"].(map[string]interface{})["%s"].(string)`, t[0], t[1])
+				v.Value = replaceRegister(v.Value)
 			}
 		}
 		return true
@@ -481,4 +479,24 @@ func addAdditionalImports(typ Type, fset *token.FileSet, f *ast.File) {
 		astutil.AddImport(fset, f, "text/template")
 
 	}
+}
+
+func replaceRegister(str string) string {
+	s := strings.TrimPrefix(str, `"$atgenRegister[`)
+	s = strings.TrimSuffix(s, `]"`)
+	t := strings.Split(s, ".")
+	var value = "atgenRegister"
+	for i := 0; i < len(t); i++ {
+		if i > 0 {
+			value += ".(map[string]interface{})"
+		}
+		if strings.Contains(t[i], "[") {
+			rep := regexp.MustCompile(`(.+)\[(\d)\]`)
+			value += rep.ReplaceAllString(t[i], `["$1"].([]interface{})[$2]`)
+		} else {
+			value += fmt.Sprintf(`["%s"]`, t[i])
+		}
+	}
+	value += ".(string)"
+	return value
 }

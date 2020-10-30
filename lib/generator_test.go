@@ -88,3 +88,46 @@ func TestFilterTestFuncAndSubtests(t *testing.T) {
 		t.Fatal("subtest.Tests[0].Path should be /v1/user/1/foo")
 	}
 }
+
+func TestReplaceRegister(t *testing.T) {
+	testCases := []struct {
+		Name  string
+		Value string
+		Want  string
+	}{
+		{
+			Name:  "Unnested data",
+			Value: `"$atgenRegister[test]"`,
+			Want:  `atgenRegister["test"].(string)`,
+		},
+		{
+			Name:  "Nested data",
+			Value: `"$atgenRegister[test.hoge]"`,
+			Want:  `atgenRegister["test"].(map[string]interface{})["hoge"].(string)`,
+		},
+		{
+			Name:  "List",
+			Value: `"$atgenRegister[test[0]]"`,
+			Want:  `atgenRegister["test"].([]interface{})[0].(string)`,
+		},
+		{
+			Name:  "List in nested data",
+			Value: `"$atgenRegister[test.hoge[0]]"`,
+			Want:  `atgenRegister["test"].(map[string]interface{})["hoge"].([]interface{})[0].(string)`,
+		},
+		{
+			Name:  "Nested data in list",
+			Value: `"$atgenRegister[test[0].hoge]"`,
+			Want:  `atgenRegister["test"].([]interface{})[0].(map[string]interface{})["hoge"].(string)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.Name, func(t *testing.T) {
+			replaced := replaceRegister(testCase.Value)
+			if replaced != testCase.Want {
+				t.Errorf("Expected %s, but acutually %s", testCase.Want, replaced)
+			}
+		})
+	}
+}
