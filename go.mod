@@ -12,10 +12,11 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/afero v1.2.0
 	github.com/tcnksm/ghr v0.13.0 // indirect
+	github.com/ulikunitz/xz v0.5.10 // indirect
 	github.com/urfave/cli v1.20.0
 	github.com/x-motemen/gobump v0.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
 	golang.org/x/lint v0.0.0-20181217174547-8f45f776aaf1 // indirect
-	golang.org/x/tools v0.0.0-20201030010431-2feb2bb1ff51
+	golang.org/x/tools v0.0.0-20190117194123-b4b6fe2cb829
 	gopkg.in/yaml.v2 v2.2.2
 )
