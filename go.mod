@@ -8,6 +8,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/afero v1.2.0
 	github.com/urfave/cli v1.22.14
+	github.com/urfave/cli/v2 v2.25.7
 	golang.org/x/tools v0.0.0-20190117194123-b4b6fe2cb829
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
