@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func convertToTestFuncsHelper(t *testing.T, parsed []map[interface{}]interface{}) TestFuncs {
+func convertToTestFuncsHelper(t *testing.T, parsed []map[string]interface{}) TestFuncs {
 	t.Helper()
 
 	funcs, err := convertToTestFuncs(parsed)

@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"golang.org/x/tools/go/packages"
-	yaml "gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v3"
 )
 
 // ParseYaml parses yaml which defines test requests/responses
@@ -61,8 +61,8 @@ func (g *Generator) ParseYaml() error {
 	return nil
 }
 
-func parseYaml(buf []byte) ([]map[interface{}]interface{}, error) {
-	var parsed []map[interface{}]interface{}
+func parseYaml(buf []byte) ([]map[string]interface{}, error) {
+	var parsed []map[string]interface{}
 	err := yaml.Unmarshal(buf, &parsed)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -70,7 +70,7 @@ func parseYaml(buf []byte) ([]map[interface{}]interface{}, error) {
 	return parsed, nil
 }
 
-func convertToTestFuncs(parsed []map[interface{}]interface{}) (TestFuncs, error) {
+func convertToTestFuncs(parsed []map[string]interface{}) (TestFuncs, error) {
 	var testFuncs TestFuncs
 	for _, p := range parsed {
 		if p["name"] == nil {
@@ -103,7 +103,7 @@ func convertToTestFuncs(parsed []map[interface{}]interface{}) (TestFuncs, error)
 		testFunc.Vars = vars
 
 		for _, t := range p["tests"].([]interface{}) {
-			t := t.(map[interface{}]interface{})
+			t := t.(map[string]interface{})
 			if t["path"] != nil {
 				test, err := convertToTest(t)
 				if err != nil {
@@ -253,7 +253,7 @@ func validateRouterFuncObj(handlerObj types.Object, routerFuncObj types.Object, 
 	return nil
 }
 
-func convertToTest(t map[interface{}]interface{}) (Test, error) {
+func convertToTest(t map[string]interface{}) (Test, error) {
 	var apiVersions []string
 	if t["apiVersions"] != nil {
 		for _, v := range t["apiVersions"].([]interface{}) {
@@ -290,14 +290,14 @@ func convertToTest(t map[interface{}]interface{}) (Test, error) {
 	}, nil
 }
 
-func convertToSubtests(s map[interface{}]interface{}) (Subtests, error) {
+func convertToSubtests(s map[string]interface{}) (Subtests, error) {
 	subTests := Subtests{}
 
 	for _, s := range s["subtests"].([]interface{}) {
-		s := s.(map[interface{}]interface{})
+		s := s.(map[string]interface{})
 		subtest := Subtest{Name: s["name"].(string)}
 		for _, t := range s["tests"].([]interface{}) {
-			t := t.(map[interface{}]interface{})
+			t := t.(map[string]interface{})
 			test, err := convertToTest(t)
 			if err != nil {
 				return subTests, err
@@ -314,7 +314,7 @@ func convertToReq(r interface{}) (Req, error) {
 		return Req{}, nil
 	}
 
-	req := r.(map[interface{}]interface{})
+	req := r.(map[string]interface{})
 
 	headers, err := convertToHeaders(req["headers"])
 	if err != nil {
@@ -368,7 +368,7 @@ func convertToRes(r interface{}) (Res, error) {
 		return Res{}, nil
 	}
 
-	res := r.(map[interface{}]interface{})
+	res := r.(map[string]interface{})
 
 	headers, err := convertToHeaders(res["headers"])
 	if err != nil {
@@ -390,16 +390,11 @@ func convertToRes(r interface{}) (Res, error) {
 func convertToParams(p interface{}) (map[string]interface{}, error) {
 	params := make(map[string]interface{})
 	if p != nil {
-		for k, v := range p.(map[interface{}]interface{}) {
-			key, ok := k.(string)
-			if !ok {
-				return params, errors.New("key should be string")
-			}
-
+		for key, v := range p.(map[string]interface{}) {
 			switch t := v.(type) {
 			case string, bool, int:
 				params[key] = t
-			case map[interface{}]interface{}:
+			case map[string]interface{}:
 				p, err := convertToParams(t)
 				if err != nil {
 					return params, err
@@ -425,12 +420,7 @@ func convertToParams(p interface{}) (map[string]interface{}, error) {
 func convertToHeaders(h interface{}) (map[string]string, error) {
 	headers := make(map[string]string)
 	if h != nil {
-		for k, v := range h.(map[interface{}]interface{}) {
-			key, ok := k.(string)
-			if !ok {
-				return headers, errors.New("header key must be string")
-			}
-
+		for key, v := range h.(map[string]interface{}) {
 			val, ok := v.(string)
 			if !ok {
 				return headers, errors.New("header val must be string")
