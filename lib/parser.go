@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
@@ -409,6 +410,9 @@ func convertToParams(p interface{}) (map[string]interface{}, error) {
 					}
 					params[key] = append(params[key].([]map[string]interface{}), p)
 				}
+			case time.Time:
+				// yaml.v3 からは日付型がサポートされるが、json の値を比較する atgen の性質上、日時は文字列のまま扱う方が都合が良い
+				return params, errors.New("atgen does not support datetime type yaml input. Please enclose the datetime in double quotes and enter it as a string.")
 			default:
 				return params, errors.New("invalid type")
 			}
