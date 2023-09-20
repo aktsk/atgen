@@ -8,15 +8,15 @@ import (
 
 	atgen "github.com/aktsk/atgen/lib"
 	"github.com/pkg/errors"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
-var commands = []cli.Command{
+var commands = []*cli.Command{
 	commandGen,
 	//commandDiff,
 }
 
-var commandGen = cli.Command{
+var commandGen = &cli.Command{
 	Name:  "gen",
 	Usage: "Generate test code",
 	Description: `
@@ -24,15 +24,17 @@ var commandGen = cli.Command{
 `,
 	Action: doGen,
 	Flags: []cli.Flag{
-		cli.StringFlag{
-			Name:  "templateDir, t",
-			Value: ".",
-			Usage: "template directory that has template yaml and code",
+		&cli.StringFlag{
+			Name:    "templateDir",
+			Aliases: []string{"t"},
+			Value:   ".",
+			Usage:   "template directory that has template yaml and code",
 		},
-		cli.StringFlag{
-			Name:  "outputDir, o",
-			Value: ".",
-			Usage: "output directory to write generated test files",
+		&cli.StringFlag{
+			Name:    "outputDir",
+			Aliases: []string{"o"},
+			Value:   ".",
+			Usage:   "output directory to write generated test files",
 		},
 	},
 }
