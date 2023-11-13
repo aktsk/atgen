@@ -58,7 +58,7 @@ func TestTeamplate(t *testing.T) {
 		}
 
 		params := make(map[string]interface{})
-		flag := false
+		isMapArray := false
 		arrayparams := make([]map[string]interface{}, 0)
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(res.Body)
@@ -67,14 +67,14 @@ func TestTeamplate(t *testing.T) {
 			err := json.Unmarshal([]byte(resBody), &params)
 			if err != nil {
 				arrayerr := json.Unmarshal([]byte(resBody), &arrayparams)
-				if err != nil {
+				if arrayerr != nil {
 					t.Fatal(err, arrayerr)
 				}
-				flag = true
+				isMapArray = true
 			}
 		}
 
-		if !flag {
+		if !isMapArray {
 			// This is replaced with req.params defined in YAML
 			atgenResParams := map[string]interface{}{}
 			checkCompare(t, params, atgenResParams)
