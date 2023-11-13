@@ -385,7 +385,6 @@ func convertToRes(r interface{}) (Res, error) {
 	if err != nil {
 		return Res{}, err
 	}
-	//fmt.Println(paramsArray)
 
 	return Res{
 		Status:      res["status"].(int),
