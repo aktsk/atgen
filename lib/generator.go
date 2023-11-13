@@ -400,7 +400,6 @@ func rewriteTestNode(n ast.Node, test Test) (ast.Node, error) {
 				h, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Headers))
 				cr.Replace(h)
 			case "atgenResParams":
-				fmt.Println("atgenResParams")
 				p, _ := parser.ParseExpr(fmt.Sprintf("%#v", test.Res.Params))
 				cr.Replace(p)
 			case "atgenResParamsArray":
