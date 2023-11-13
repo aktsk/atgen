@@ -58,20 +58,30 @@ func TestTeamplate(t *testing.T) {
 		}
 
 		params := make(map[string]interface{})
-
+		flag := false
+		arrayparams := make([]map[string]interface{}, 0)
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(res.Body)
 		resBody := buf.String()
 		if resBody != "" {
 			err := json.Unmarshal([]byte(resBody), &params)
 			if err != nil {
-				t.Fatal(err)
+				arrayerr := json.Unmarshal([]byte(resBody), &arrayparams)
+				if err != nil {
+					t.Fatal(err, arrayerr)
+				}
+				flag = true
 			}
 		}
 
-		// This is replaced with req.params defined in YAML
-		atgenResParams := map[string]interface{}{}
-		checkCompare(t, params, atgenResParams)
+		if !flag {
+			// This is replaced with req.params defined in YAML
+			atgenResParams := map[string]interface{}{}
+			checkCompare(t, params, atgenResParams)
+		} else {
+			atgenResParamsArray := []map[string]interface{}{}
+			checkCompareArray(t, arrayparams, atgenResParamsArray)
+		}
 
 		atgenRegister["atgenRegisterKey"] = params
 	}

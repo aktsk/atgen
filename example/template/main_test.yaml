@@ -131,3 +131,25 @@
         status: 200
         params:
           firstname: $atgenRegister[people.people[0].firstname]
+
+- name: TestNestedDataInRegisters
+  routerFunc: ../handlers.GetRouter
+  apiVersions:
+    - v1
+  tests:
+    - path: /{apiVersion}/people
+      method: get
+      res:
+        status: 200
+      register: people
+    - path: /{apiVersion}/people/1
+      method: get
+      res:
+        status: 200
+        paramsArray:
+          - id: "1"
+            firstname: John
+            lastname: Doe
+          - id: "2"
+            firstname: Jane
+            lastname: Doe
