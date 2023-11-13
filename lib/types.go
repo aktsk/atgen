@@ -69,8 +69,8 @@ const (
 type Res struct {
 	Status      int
 	Params      map[string]interface{}
-	Headers     map[string]string
 	ParamsArray []map[string]interface{}
+	Headers     map[string]string
 }
 
 // Tester is an interface for Test and Subtest
