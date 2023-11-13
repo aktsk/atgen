@@ -67,9 +67,10 @@ const (
 
 // Res is a response status, parameters and headers which a test should get
 type Res struct {
-	Status  int
-	Params  map[string]interface{}
-	Headers map[string]string
+	Status      int
+	Params      map[string]interface{}
+	Headers     map[string]string
+	ParamsArray []map[string]interface{}
 }
 
 // Tester is an interface for Test and Subtest

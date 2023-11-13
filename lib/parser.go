@@ -381,10 +381,17 @@ func convertToRes(r interface{}) (Res, error) {
 		return Res{}, err
 	}
 
+	paramsArray, err := convertToParamsArray(res["paramsArray"])
+	if err != nil {
+		return Res{}, err
+	}
+	//fmt.Println(paramsArray)
+
 	return Res{
-		Status:  res["status"].(int),
-		Params:  params,
-		Headers: headers,
+		Status:      res["status"].(int),
+		Params:      params,
+		Headers:     headers,
+		ParamsArray: paramsArray,
 	}, nil
 }
 
@@ -416,6 +423,20 @@ func convertToParams(p interface{}) (map[string]interface{}, error) {
 			default:
 				return params, errors.New("invalid type")
 			}
+		}
+	}
+	return params, nil
+}
+
+func convertToParamsArray(p interface{}) ([]map[string]interface{}, error) {
+	params := make([]map[string]interface{}, 0)
+	if p != nil {
+		for _, v := range p.([]interface{}) {
+			p, err := convertToParams(v)
+			if err != nil {
+				return params, err
+			}
+			params = append(params, p)
 		}
 	}
 	return params, nil
