@@ -58,29 +58,27 @@ func TestTeamplate(t *testing.T) {
 		}
 
 		params := make(map[string]interface{})
-		isMapArray := false
 		arrayparams := make([]map[string]interface{}, 0)
+		atgenResParams := map[string]interface{}{}
+		atgenResParamsArray := []map[string]interface{}{}
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(res.Body)
 		resBody := buf.String()
 		if resBody != "" {
-			err := json.Unmarshal([]byte(resBody), &params)
-			if err != nil {
-				arrayerr := json.Unmarshal([]byte(resBody), &arrayparams)
-				if arrayerr != nil {
-					t.Fatal(err, arrayerr)
+			// array
+			if len(atgenResParamsArray) > 0 {
+				err := json.Unmarshal([]byte(resBody), &arrayparams)
+				if err != nil {
+					t.Fatal(err)
 				}
-				isMapArray = true
+				checkCompareArray(t, arrayparams, atgenResParamsArray)
+			} else {
+				err := json.Unmarshal([]byte(resBody), &params)
+				if err != nil {
+					t.Fatal(err)
+				}
+				checkCompare(t, params, atgenResParams)
 			}
-		}
-
-		if !isMapArray {
-			// This is replaced with req.params defined in YAML
-			atgenResParams := map[string]interface{}{}
-			checkCompare(t, params, atgenResParams)
-		} else {
-			atgenResParamsArray := []map[string]interface{}{}
-			checkCompareArray(t, arrayparams, atgenResParamsArray)
 		}
 
 		atgenRegister["atgenRegisterKey"] = params
