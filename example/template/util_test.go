@@ -32,3 +32,16 @@ func checkCompare(t *testing.T, actual, expected interface{}) {
 		}
 	}
 }
+
+func checkCompareArray(t *testing.T, actual, expected interface{}) {
+	t.Helper()
+
+	if actual == nil {
+		t.Fatalf("Expected response should include %#v, but actually %#v", expected, actual)
+	}
+
+	a := actual.([]map[string]interface{})
+	for i, e := range expected.([]map[string]interface{}) {
+		checkCompare(t, a[i], e)
+	}
+}
