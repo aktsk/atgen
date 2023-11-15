@@ -3,7 +3,7 @@ module github.com/aktsk/atgen
 go 1.21.1
 
 require (
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	github.com/lkesteloot/astutil v0.0.0-20130122170032-b6715328cfa5
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/afero v1.9.5
