@@ -1,5 +1,23 @@
 # Changelog
 
+## [v0.8.0](https://github.com/aktsk/atgen/compare/v0.7.0...v0.8.0) (2023-11-15)
+
+* exampleに```/v1/people/all```を追加する。 [#55](https://github.com/aktsk/atgen/pull/55) ([seipan](https://github.com/seipan))
+* 配列型のjsonのレスポンスチェックに対応させる [#53](https://github.com/aktsk/atgen/pull/53) ([seipan](https://github.com/seipan))
+* Bump golang.org/x/text from 0.3.2 to 0.3.8 [#31](https://github.com/aktsk/atgen/pull/31) ([dependabot[bot]](https://github.com/apps/dependabot))
+* Update module golang.org/x/tools to v0.13.0 [#40](https://github.com/aktsk/atgen/pull/40) ([renovate[bot]](https://github.com/apps/renovate))
+* Update module github.com/spf13/afero to v1.9.5 [#37](https://github.com/aktsk/atgen/pull/37) ([renovate[bot]](https://github.com/apps/renovate))
+* 依存関係の更新 [#48](https://github.com/aktsk/atgen/pull/48) ([takanakahiko](https://github.com/takanakahiko))
+* Update module github.com/urfave/cli to v2 [#44](https://github.com/aktsk/atgen/pull/44) ([renovate[bot]](https://github.com/apps/renovate))
+* Update module github.com/urfave/cli to v1.22.14 [#39](https://github.com/aktsk/atgen/pull/39) ([renovate[bot]](https://github.com/apps/renovate))
+* Update actions/checkout action to v4 [#42](https://github.com/aktsk/atgen/pull/42) ([renovate[bot]](https://github.com/apps/renovate))
+* Update module gopkg.in/yaml.v2 to v3 [#45](https://github.com/aktsk/atgen/pull/45) ([renovate[bot]](https://github.com/apps/renovate))
+* Update actions/setup-go action to v4 [#43](https://github.com/aktsk/atgen/pull/43) ([renovate[bot]](https://github.com/apps/renovate))
+* Update module github.com/gorilla/mux to v1.8.0 [#36](https://github.com/aktsk/atgen/pull/36) ([renovate[bot]](https://github.com/apps/renovate))
+* Configure Renovate [#35](https://github.com/aktsk/atgen/pull/35) ([renovate[bot]](https://github.com/apps/renovate))
+* Bump gopkg.in/yaml.v2 from 2.2.2 to 2.2.8 [#30](https://github.com/aktsk/atgen/pull/30) ([dependabot[bot]](https://github.com/apps/dependabot))
+* Update go modules [#29](https://github.com/aktsk/atgen/pull/29) ([mizzy](https://github.com/mizzy))
+
 ## [v0.7.0](https://github.com/aktsk/atgen/compare/v0.6.0...v0.7.0) (2020-10-30)
 
 * Access nested data with register [#27](https://github.com/aktsk/atgen/pull/27) ([takanakahiko](https://github.com/takanakahiko))
