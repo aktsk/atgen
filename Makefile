@@ -29,7 +29,7 @@ package: setup
 
 crossbuild: setup
 	goxz -pv=v${VERSION} -build-ldflags="-X main.GitCommit=${REVISION}" \
-        -arch=386,amd64 -d=./pkg/dist/v${VERSION} \
+        -d=./pkg/dist/v${VERSION} \
         -n ${NAME}
 
 release: package
