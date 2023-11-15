@@ -32,6 +32,13 @@ func GetPeople(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func GetPeopleArray(w http.ResponseWriter, r *http.Request) {
+	person1 := Person{ID: "1", Firstname: "John", Lastname: "Doe"}
+	person2 := Person{ID: "2", Firstname: "Jane", Lastname: "Doe"}
+	people := []Person{person1, person2}
+	json.NewEncoder(w).Encode(people)
+}
+
 // GetPerson displays a single data
 func GetPerson(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -88,6 +95,7 @@ func GetRouter() *mux.Router {
 	people = append(people, Person{ID: "1", Firstname: "John", Lastname: "Doe", Address: &Address{City: "City X", State: "State X"}})
 	people = append(people, Person{ID: "2", Firstname: "Koko", Lastname: "Doe", Address: &Address{City: "City Z", State: "State Y"}})
 	router.HandleFunc("/v1/people", GetPeople).Methods("GET")
+	router.HandleFunc("/v1/people/all", GetPeopleArray).Methods("GET")
 	router.HandleFunc("/v1/people/{id}", GetPerson).Methods("GET")
 	router.HandleFunc("/v1/people/{id}", CreatePerson).Methods("POST")
 	router.HandleFunc("/v1/form/people/{id}", CreatePersonFromForm).Methods("POST")
