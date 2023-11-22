@@ -2,7 +2,6 @@ package atgen
 
 import (
 	"go/types"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,7 +16,7 @@ import (
 // ParseYaml parses yaml which defines test requests/responses
 // and convert it to types defined in types.go
 func (g *Generator) ParseYaml() error {
-	buf, err := ioutil.ReadFile(g.Yaml)
+	buf, err := os.ReadFile(g.Yaml)
 	if err != nil {
 		return errors.WithStack(err)
 	}
