@@ -7,7 +7,6 @@ import (
 	"go/parser"
 	"go/token"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -33,7 +32,7 @@ func (g *Generator) Generate() error {
 	tfuncs := filterTestFuncs(g.TestFuncs)
 	for v, t := range tfuncs {
 		filename := fmt.Sprintf("%s_%s.go", v, base)
-		tf, err := ioutil.TempFile(g.OutputDir, filename)
+		tf, err := os.CreateTemp(g.OutputDir, filename)
 		if err != nil {
 			return errors.WithStack(err)
 		}
