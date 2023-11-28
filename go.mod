@@ -6,7 +6,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/lkesteloot/astutil v0.0.0-20130122170032-b6715328cfa5
 	github.com/pkg/errors v0.9.1
-	github.com/spf13/afero v1.9.5
+	github.com/spf13/afero v1.11.0
 	github.com/urfave/cli/v2 v2.25.7
 	golang.org/x/tools v0.16.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -26,7 +26,7 @@ require (
 	github.com/dsnet/compress v0.0.2-0.20210315054119-f66993602bf5 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/goccy/go-yaml v1.9.4 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-github v17.0.0+incompatible // indirect
 	github.com/google/go-github/v41 v41.0.0 // indirect
@@ -57,11 +57,11 @@ require (
 	golang.org/x/crypto v0.16.0 // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
-	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1 // indirect
+	golang.org/x/oauth2 v0.15.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.28.1 // indirect
+	google.golang.org/protobuf v1.31.0 // indirect
 )
