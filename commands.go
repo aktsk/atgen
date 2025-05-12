@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -96,7 +95,7 @@ func copyFile(s, d string) error {
 	defer src.Close()
 	dstdir := filepath.Dir(d)
 
-	tmpdst, err := ioutil.TempFile(dstdir, "tmp-")
+	tmpdst, err := os.CreateTemp(dstdir, "tmp-")
 	if err != nil {
 		return errors.WithStack(err)
 	}
