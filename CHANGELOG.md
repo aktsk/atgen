@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.9.0](https://github.com/aktsk/atgen/compare/v0.8.0...v0.9.0) (2025-05-12)
+
+* Use Go 1.23, upgrade dependencies [#67](https://github.com/aktsk/atgen/pull/67) ([otofune](https://github.com/otofune))
+* Update module golang.org/x/tools to v0.16.0 [#59](https://github.com/aktsk/atgen/pull/59) ([renovate[bot]](https://github.com/apps/renovate))
+* ioutilからosに置き換える [#58](https://github.com/aktsk/atgen/pull/58) ([seipan](https://github.com/seipan))
+
 ## [v0.8.0](https://github.com/aktsk/atgen/compare/v0.7.0...v0.8.0) (2023-11-15)
 
 * exampleに```/v1/people/all```を追加する。 [#55](https://github.com/aktsk/atgen/pull/55) ([seipan](https://github.com/seipan))
