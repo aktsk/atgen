@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"io"
 	"io/ioutil"
 	"os"
@@ -8,7 +9,7 @@ import (
 
 	atgen "github.com/aktsk/atgen/lib"
 	"github.com/pkg/errors"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 var commands = []*cli.Command{
@@ -39,9 +40,9 @@ var commandGen = &cli.Command{
 	},
 }
 
-func doGen(c *cli.Context) error {
-	templateDir := c.String("templateDir")
-	outputDir := c.String("outputDir")
+func doGen(_ context.Context, cmd *cli.Command) error {
+	templateDir := cmd.String("templateDir")
+	outputDir := cmd.String("outputDir")
 
 	testFiles, err := filepath.Glob(filepath.Join(templateDir, "*_test.go"))
 	if err != nil {
