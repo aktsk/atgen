@@ -7,7 +7,7 @@ require (
 	github.com/lkesteloot/astutil v0.0.0-20130122170032-b6715328cfa5
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/afero v1.14.0
-	github.com/urfave/cli/v3 v3.3.3
+	github.com/urfave/cli/v3 v3.3.8
 	golang.org/x/tools v0.33.0
 	gopkg.in/yaml.v3 v3.0.1
 )
